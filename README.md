@@ -8,6 +8,8 @@ Having used multiple tools for remote planning, I found that there is one situat
 
 ## Testing
 
+Note that the triple quotes are required only for testing in Windows.
+
 Get a list of sessions:
     curl -u user:pass -i http://localhost:5000/votecalc/sessions
 
@@ -18,7 +20,7 @@ Create a new session:
     curl -u user:pass -i http://localhost:5000/votecalc/session/new
 
 Update a session:
-    curl -u user:pass -i -H "Content-Type: application/json" -X PUT -d """{"title":"the text"}""" http://localhost:5000/votecalc/session/2
+    curl -u user:pass -i -H "Content-Type: application/json" -X PUT -d """{"title":"The New Title"}""" http://localhost:5000/votecalc/session/s1234567
 
 Delete a session:
     curl -u user:pass -i -X DELETE -d http://localhost:5000/votecalc/session/s1234567
