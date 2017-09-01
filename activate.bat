@@ -1,0 +1,1 @@
+".\localenv\Scripts\activate.bat" 
