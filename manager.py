@@ -8,11 +8,11 @@ class Manager:
     def __init__(self):
         self.session_list = {}  # dictionary
 
-    def create_session(self):
+    def create_session(self, title=""):
         # Evolve this to pull from a data store
         x = random.random() * 99999999
         session_id = "s" + str(int(x))  # Example: s5839483
-        sess = Session(session_id)  # create Session object
+        sess = Session(session_id, title)  # create Session object
         self.session_list[session_id] = sess  # store under random id
         return sess
 

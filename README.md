@@ -6,3 +6,19 @@ Author: Michael Wilkes
 ## Background
 Having used multiple tools for remote planning, I found that there is one situation they do not handle well: A hybrid team that is both local (multiple people in the office) and remote. This scenario presents some unique challenges for gathering votes and calculating results.
 
+## Testing
+
+Get a list of sessions:
+    curl -u user:pass -i http://localhost:5000/votecalc/sessions
+
+Get a single session:
+    curl -u user:pass -i http://localhost:5000/votecalc/session/s1234567
+
+Create a new session:
+    curl -u user:pass -i http://localhost:5000/votecalc/session/new
+
+Update a session:
+    curl -u user:pass -i -H "Content-Type: application/json" -X PUT -d """{"title":"the text"}""" http://localhost:5000/votecalc/session/2
+
+Delete a session:
+    curl -u user:pass -i -X DELETE -d http://localhost:5000/votecalc/session/s1234567

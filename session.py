@@ -1,6 +1,6 @@
 
 class Session:
-    def __init__(self, new_id):
+    def __init__(self, new_id, title=""):
         self.id = new_id
-        self.title = ""  # title of work being voted on
+        self.title = title
         self.votes = []  # {username:vote}
