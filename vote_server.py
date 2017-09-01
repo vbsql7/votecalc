@@ -5,7 +5,7 @@ from flask import make_response
 from flask import request
 from flask_httpauth import HTTPBasicAuth
 
-from controllers.manager import Manager
+from manager import Manager
 
 import sys
 
