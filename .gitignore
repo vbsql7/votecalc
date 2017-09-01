@@ -1,0 +1,4 @@
+# Ignore these files during source sync
+
+env
+activate.bat

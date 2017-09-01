@@ -1,1 +1,1 @@
-".\localenv\Scripts\activate.bat" 
+".\env\Scripts\activate.bat" 
