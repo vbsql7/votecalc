@@ -25,5 +25,6 @@ class Manager:
     def delete_session(self, key):
         if key in self.session_list:
             self.session_list.pop(key, None)
+            return True
         else:
             abort(404)

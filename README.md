@@ -6,6 +6,12 @@ Author: Michael Wilkes
 ## Background
 Having used multiple tools for remote planning, I found that there is one situation they do not handle well: A hybrid team that is both local (multiple people in the office) and remote. This scenario presents some unique challenges for gathering votes and calculating results.
 
+## Dependencies
+
+- flask
+- flask-httpauth
+- jsonpickle
+
 ## Testing
 
 Note that the triple quotes are required only for testing in Windows.

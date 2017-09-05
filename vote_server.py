@@ -7,6 +7,8 @@ from flask_httpauth import HTTPBasicAuth
 
 from manager import Manager
 
+from json import loads
+
 import jsonpickle
 
 import sys
@@ -35,9 +37,9 @@ def not_found(error):
 
 
 @app.route('/votecalc/sessions', methods=['GET'])
-@auth.login_required
+#  @auth.login_required
 def get_sessions():
-    x = '{' + '"sessions":' +  jsonpickle.encode(session_manager.session_list, unpicklable=False) + '}'
+    x = '{' + '"sessions":' + jsonpickle.encode(session_manager.session_list, unpicklable=False) + '}'
     return x
 
 
@@ -53,18 +55,21 @@ def get_session(session_id):
 @app.route('/votecalc/session/new', methods=['GET'])
 def create_session():
     sess = session_manager.create_session()
-    return jsonify({'Session ID:': sess.id}), 201
+    return jsonify({'id': sess.id}), 201
 
 
 @app.route('/votecalc/session/<session_id>', methods=['PUT'])
 def update_session(session_id):
-    if not request.json:
+    if not request.is_json:
         abort(400)
     sess = session_manager.get_session(session_id)
     if sess is None:
         abort(404)
+    # Extract incoming json object
+    s = request.json
+    d = loads(s)
     # Update session attributes
-    sess.title = request.json.get('title')
+    sess.title = d['title']
     return jsonpickle.encode(sess, unpicklable=False)
 
 
@@ -73,8 +78,15 @@ def delete_session(session_id):
     sess = session_manager.get_session(session_id)
     if sess is None:
         abort(404)
-    session_manager.delete_session(sess.id)
-    return jsonify({'result': True})
+    result = session_manager.delete_session(sess.id)
+    return jsonify(result)
+
+
+def debugmsg(msg):
+    print('*************************************')
+    print(msg)
+    print('*************************************')
+
 
 if __name__ == '__main__':
     try:
