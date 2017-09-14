@@ -11,8 +11,13 @@ Having used multiple tools for remote planning, I found that there is one situat
 - flask
 - flask-httpauth
 - jsonpickle
+- requests
 
-## Testing
+## Unit Tests
+
+See test.py
+
+## Manual Testing
 
 Note that the triple quotes are required only for testing in Windows.
 
