@@ -6,7 +6,8 @@ class SessionTest(unittest.TestCase):
     def setUpClass(self):
         print('\nSETTING UP TESTS')
         self.base_url = "http://localhost:5000/"
-        self.session_id = create_session()
+        self.session_id = create_session()  # This id will be used for singleton tests
+        _ = create_session()  # Create another one for list testing but we don't keep the id
         self.assertIsNotNone(self, self.session_id)
 
     def test_a_get(self):
@@ -34,10 +35,10 @@ class SessionTest(unittest.TestCase):
         url = self.base_url + "votecalc/sessions"
         print('URL: ' + url)
         result = requests.get(url)
-        sessions = result.json()['sessions']
+        sessions = result.json()
         counter = 0
         for key, item in sessions.items():
-            print('KEY: ' + key)
+            print('\nKEY: ' + key)
             print("id: " + item['id'])
             print("title: " + item['title'])
             counter += 1

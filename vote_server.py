@@ -39,7 +39,7 @@ def not_found(error):
 @app.route('/votecalc/sessions', methods=['GET'])
 #  @auth.login_required
 def get_sessions():
-    x = '{' + '"sessions":' + jsonpickle.encode(session_manager.session_list, unpicklable=False) + '}'
+    x = jsonpickle.encode(session_manager.session_list, unpicklable=False)
     return x
 
 
