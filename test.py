@@ -22,9 +22,9 @@ class SessionTest(unittest.TestCase):
         print('\nTESTING PUT')
         test_val = "TEST TITLE"
         url = self.base_url + "votecalc/session/" + self.session_id
-        parms = '{"title": "' + test_val + '"}'
+        parms = {"title": test_val}
         hdr = '{"Content-Type: application/json"}'
-        print('URL: ' + url + ", PARMS: " + parms)
+        print('URL: ' + url + ", PARMS: " + str(parms))
         result = requests.put(url, json=parms)
         # result should contain the modified session object
         d = result.json()
@@ -54,7 +54,7 @@ class SessionTest(unittest.TestCase):
 
 def create_session():
     url = SessionTest.base_url + "votecalc/session/new"
-    result = requests.get(url)
+    result = requests.post(url)
     d = result.json()
     session_id = d['id']
     return session_id

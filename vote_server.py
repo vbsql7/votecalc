@@ -54,7 +54,7 @@ def get_session(session_id):
         return jsonpickle.encode(sess, unpicklable=False)
 
 
-@app.route('/votecalc/session/new', methods=['GET'])
+@app.route('/votecalc/session/new', methods=['POST'])
 def create_session():
     sess = session_manager.create_session()
     return jsonify({'id': sess.id}), 201
@@ -71,7 +71,6 @@ def update_session(session_id):
     data = request.json
     # Update session attributes
     t = data['title']
-    # debugmsg('title: ' + t)
     sess.title = t
     return jsonpickle.encode(sess, unpicklable=False)
 
