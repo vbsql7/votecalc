@@ -15,14 +15,44 @@
             $(document).ready( WireEvents );
 
             function WireEvents(){
-                $('#btnJoin').click( DoJoin );
+                $('#btnJoin').click( do_join_button );
             };
 
-            function DoJoin(){
-                var s = $('#txtSession').text
-                var server_url = "http://localhost:5000/votecalc/session/" + s;
-                $('#TestData').load(server_url);
+            function do_join_button(){
+                var s = $('#txtSession').val();
+                var url = "http://localhost:5000/votecalc/session/" + s;
+                fetch_json(url);
             };
+
+            function fetch_json(server_url) {
+                $.ajax({
+                    url: server_url,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
+                    },
+                    dataType: 'json',
+                    crossDomain: true,
+                    jsonp: false,
+                    success: function (data) { parseResponse(data) },
+                    error: function (xhr, status, error) {
+                        var err = eval("(" + xhr.responseText + ")");
+                        alert('Error in ajax call: ' + err.Message);
+                    }
+                });
+            }
+
+            function parseResponse(data) {
+                var x = JSON.stringify(data);
+                alert('parsed: ' + x);
+                $('#TestData').html(x);
+            }
+
+            function make_base_auth(user, password) {
+                var tok = user + ':' + password;
+                var hash = btoa(tok);
+                return 'Basic ' + hash;
+            }
 
         </script>
     </head>
@@ -32,8 +62,8 @@
 
         <div class="row">
             <span class="col-xs-6 col-sm-4">Session Number:</span>
-            <span class="col-xs-6 col-sm-4"><input class="col-md-4" id="txtSession" type="text"/></span>
-            <span col-xs-6 col-sm-4><input id="btnJoin" type="button" value="Join" /></span>
+            <span class="col-xs-6 col-sm-4"><input class="col-md-4" id="txtSession" value="LU93" type="text"/></span>
+            <span class="col-xs-6 col-sm-4"><input id="btnJoin" type="button" value="Join" /></span>
             <span class="col-xs-6 col-sm-4 invisible" id="session_id">nnnnnn</span>
         </div>
         <div class="row">
@@ -41,7 +71,8 @@
             <span class="col-xs-6 col-sm-4" id="title">not joined yet</span>
         </div>
 
-        <div id="TestData">
+        <div class="row" id="TestData">
+            <span class="col-xs-6 col-sm-4">no test data yet</span>
         </div>
     </div>
     </body>
