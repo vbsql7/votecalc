@@ -12,6 +12,7 @@ Having used multiple tools for remote planning, I found that there is one situat
 - flask-httpauth
 - jsonpickle
 - requests
+- flask-cors
 
 ## Unit Tests
 

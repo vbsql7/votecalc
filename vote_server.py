@@ -4,6 +4,7 @@ from flask import abort
 from flask import make_response
 from flask import request
 from flask_httpauth import HTTPBasicAuth
+from flask_cors import CORS, cross_origin
 
 from manager import Manager
 
@@ -30,6 +31,7 @@ def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
 app = Flask(__name__)
+CORS(app)  # Allow cross-domain requests
 
 @app.errorhandler(404)
 def not_found(error):
@@ -66,10 +68,11 @@ def update_session(session_id):
     if sess is None:
         abort(404)
     # Extract incoming json object
-    s = request.json
-    d = loads(s)
+    data = request.json
     # Update session attributes
-    sess.title = d['title']
+    t = data['title']
+    # debugmsg('title: ' + t)
+    sess.title = t
     return jsonpickle.encode(sess, unpicklable=False)
 
 

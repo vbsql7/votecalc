@@ -11,50 +11,8 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-        <script>
-            $(document).ready( WireEvents );
-
-            function WireEvents(){
-                $('#btnJoin').click( do_join_button );
-            };
-
-            function do_join_button(){
-                var s = $('#txtSession').val();
-                var url = "http://localhost:5000/votecalc/session/" + s;
-                fetch_json(url);
-            };
-
-            function fetch_json(server_url) {
-                $.ajax({
-                    url: server_url,
-                    type: 'GET',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
-                    },
-                    dataType: 'json',
-                    crossDomain: true,
-                    jsonp: false,
-                    success: function (data) { parseResponse(data) },
-                    error: function (xhr, status, error) {
-                        var err = eval("(" + xhr.responseText + ")");
-                        alert('Error in ajax call: ' + err.Message);
-                    }
-                });
-            }
-
-            function parseResponse(data) {
-                var x = JSON.stringify(data);
-                alert('parsed: ' + x);
-                $('#TestData').html(x);
-            }
-
-            function make_base_auth(user, password) {
-                var tok = user + ':' + password;
-                var hash = btoa(tok);
-                return 'Basic ' + hash;
-            }
-
-        </script>
+        <!-- Custom jQuery and javascript for this app -->
+        <script src="vc_scripts.js"></script>
     </head>
 
     <body>
@@ -62,7 +20,7 @@
 
         <div class="row">
             <span class="col-xs-6 col-sm-4">Session Number:</span>
-            <span class="col-xs-6 col-sm-4"><input class="col-md-4" id="txtSession" value="LU93" type="text"/></span>
+            <span class="col-xs-6 col-sm-4"><input class="col-md-4" id="txtSession" value="CC05" type="text"/></span>
             <span class="col-xs-6 col-sm-4"><input id="btnJoin" type="button" value="Join" /></span>
             <span class="col-xs-6 col-sm-4 invisible" id="session_id">nnnnnn</span>
         </div>
@@ -74,7 +32,19 @@
         <div class="row" id="TestData">
             <span class="col-xs-6 col-sm-4">no test data yet</span>
         </div>
+
+        <div class="row">
+            <span class="col-xs-6 col-sm-4">Title:</span>
+            <span class="col-xs-6 col-sm-4"><input class="col-md-4" id="txtTitle" value="TEST TITLE" type="text"/></span>
+            <span class="col-xs-6 col-sm-4"><input id="btnSetTitle" type="button" value="Set Title" /></span>
+        </div>
+
+        <div class="row" id="Log">
+            <span class="col-xs-6 col-sm-4">no test data yet</span>
+        </div>
+        <div class="alert alert-warning" id="error_details"></div>
     </div>
+
     </body>
 
 </html>
