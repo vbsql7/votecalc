@@ -19,6 +19,7 @@ auth = HTTPBasicAuth()
 # Load manager and sessions list
 session_manager = Manager()
 
+
 # Require master user and password to prevent random invocations
 @auth.get_password
 def get_password(username):
@@ -30,8 +31,10 @@ def get_password(username):
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
+
 app = Flask(__name__)
 CORS(app)  # Allow cross-domain requests
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -41,48 +44,64 @@ def not_found(error):
 @app.route('/votecalc/sessions', methods=['GET'])
 #  @auth.login_required
 def get_sessions():
-    x = jsonpickle.encode(session_manager.session_list, unpicklable=False)
-    return x
+    try:
+        x = jsonpickle.encode(session_manager.session_list, unpicklable=False)
+        return x
+    except:
+        debugmsg('Error during get_sessions: ' + str(sys.exc_info()[0]))
+        raise
 
 
 @app.route('/votecalc/session/<session_id>', methods=['GET'])
 def get_session(session_id):
-    sess = session_manager.get_session(session_id)
-    if sess is None:
-        abort(404)
-    else:
-        return jsonpickle.encode(sess, unpicklable=False)
-
+    try:
+        sess = session_manager.get_session(session_id)
+        if sess is None:
+            abort(404)
+        else:
+            return jsonpickle.encode(sess, unpicklable=False)
+    except:
+        debugmsg('Error during get_session: ' + str(sys.exc_info()[0]))
+        raise
 
 @app.route('/votecalc/session/new', methods=['POST'])
 def create_session():
-    sess = session_manager.create_session()
-    return jsonify({'id': sess.id}), 201
-
+    try:
+        sess = session_manager.create_session()
+        return jsonify({'id': sess.id}), 201
+    except:
+        debugmsg('Error during create_session: ' + str(sys.exc_info()[0]))
+        raise
 
 @app.route('/votecalc/session/<session_id>', methods=['PUT'])
 def update_session(session_id):
     if not request.is_json:
         abort(400)
-    sess = session_manager.get_session(session_id)
-    if sess is None:
-        abort(404)
-    # Extract incoming json object
-    data = request.json
-    # Update session attributes
-    t = data['title']
-    sess.title = t
-    return jsonpickle.encode(sess, unpicklable=False)
-
+    try:
+        sess = session_manager.get_session(session_id)
+        if sess is None:
+            abort(404)
+        # Extract incoming json object
+        data = request.json
+        # Update session attributes
+        t = data['title']
+        sess.title = t
+        return jsonpickle.encode(sess, unpicklable=False)
+    except:
+        debugmsg('Error during update_session: ' + str(sys.exc_info()[0]))
+        raise
 
 @app.route('/votecalc/session/<session_id>', methods=['DELETE'])
 def delete_session(session_id):
-    sess = session_manager.get_session(session_id)
-    if sess is None:
-        abort(404)
-    result = session_manager.delete_session(sess.id)
-    return jsonify(result)
-
+    try:
+        sess = session_manager.get_session(session_id)
+        if sess is None:
+            abort(404)
+        result = session_manager.delete_session(sess.id)
+        return jsonify(result)
+    except:
+        debugmsg('Error during delete_session: ' + str(sys.exc_info()[0]))
+        raise
 
 def debugmsg(msg):
     print('*************************************')

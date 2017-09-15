@@ -29,7 +29,7 @@ Get a single session:
     curl -u user:pass -i http://localhost:5000/votecalc/session/s1234567
 
 Create a new session:
-    curl -u user:pass -i http://localhost:5000/votecalc/session/new
+    curl -u user:pass -i -H "Content-Type: application/json" -X POST http://localhost:5000/votecalc/session/new
 
 Update a session:
     curl -u user:pass -i -H "Content-Type: application/json" -X PUT -d """{"title":"The New Title"}""" http://localhost:5000/votecalc/session/s1234567

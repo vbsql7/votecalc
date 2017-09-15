@@ -1,3 +1,5 @@
+// Custom scripts for application
+
 $(document).ready( WireEvents );
 
 function WireEvents(){
@@ -8,7 +10,7 @@ function WireEvents(){
 function do_join_button(){
     var s = $('#txtSession').val();
     var url = "http://localhost:5000/votecalc/session/" + s;
-    fetch_json(url);
+    request_join(url);
 };
 
 function do_set_title_button(){
@@ -16,10 +18,10 @@ function do_set_title_button(){
     var title_text = $('#txtTitle').val();
     var post_data = JSON.stringify({title: title_text});
     var url = "http://localhost:5000/votecalc/session/" + s;
-    post_json(url, post_data);
+    post_title(url, post_data);
 };
 
-function post_json(server_url, post_data) {
+function post_title(server_url, post_data) {
     logit('url: ' + server_url);
     logit('data: ' + post_data);
     $.ajax({
@@ -31,12 +33,12 @@ function post_json(server_url, post_data) {
             xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
         },
         contentType: 'application/json',
-        success: function (data) { parseResponse(data) },
+        success: function (data) { handlePostTitleResponse(data) },
         error: OnError
     });
 }
 
-function fetch_json(server_url) {
+function request_join(server_url) {
     logit('url: ' + server_url);
     $.ajax({
         url: server_url,
@@ -47,18 +49,23 @@ function fetch_json(server_url) {
         dataType: 'json',
         crossDomain: true,
         jsonp: false,
-        success: function (data) { parseResponse(data) },
+        success: function (data) { handleJoinResponse(data) },
         error: OnError
     });
 }
 
-function parseResponse(data) {
-    // var x = JSON.stringify(data);
-    // logit('parsed: ' + x);
-    logit('data: ' + data);
-    logit('typeof: ' + typeof data);
-    logit('id: ' + data.id + ', title: ' + data.title);
-    $('#TestData').html('id: ' + data.id + ', title: ' + data.title);
+function handleJoinResponse(data) {
+    // Hide session input box
+    $('#txtSession').css('visibility', 'hidden')
+    $('#btnJoin').css('visibility', 'hidden')
+    // Show data retrieved
+    $('#lblSessionId').html(data.id);
+    $('#lblSessionId').css('visibility','visible');
+    $('#lblTitle').html(data.title);
+}
+
+function handlePostTitleResponse(data) {
+    $('#lblTitle').html(data.title);
 }
 
 function make_base_auth(user, password) {
@@ -84,13 +91,5 @@ function OnError(xhr, errorType, exception) {
         responseText = xhr.responseText;
         $("#error_details").html(responseText);
     }
-    $("#error_details").dialog({
-        title: "jQuery Exception Details",
-        width: 700,
-        buttons: {
-            Close: function () {
-                $(this).dialog('close');
-            }
-        }
-    });
+
 }
