@@ -5,21 +5,59 @@ $(document).ready( WireEvents );
 function WireEvents(){
     $('#btnJoin').click( do_join_button );
     $('#btnSetTitle').click( do_set_title_button );
+    $('#btnCreate').click( do_create_button );
+    $('#btnVote').click( do_vote_button );
+    clear_error();
 };
 
 function do_join_button(){
+    clear_error();
     var s = $('#txtSession').val();
     var url = "http://localhost:5000/votecalc/session/" + s;
     request_join(url);
 };
 
 function do_set_title_button(){
+    clear_error();
     var s = $('#txtSession').val();
     var title_text = $('#txtTitle').val();
     var post_data = JSON.stringify({title: title_text});
     var url = "http://localhost:5000/votecalc/session/" + s;
     post_title(url, post_data);
 };
+
+function do_vote_button(){
+    clear_error();
+    var this_username = $('#txtUser').val();
+    var this_vote = $('#txtVote').val();
+    var session_id = $('#lblSessionId').html();
+    var url = "http://localhost:5000/votecalc/session/" + session_id + "/vote";
+    data = JSON.stringify({username: this_username, vote: this_vote});
+    post_vote(url, data);
+};
+
+function do_create_button(){
+    clear_error();
+    var url = "http://localhost:5000/votecalc/session/new";
+    request_create(url);
+};
+
+function post_vote(server_url, post_data) {
+    logit('url: ' + server_url);
+    logit('data: ' + post_data);
+    $.ajax({
+        url: server_url,
+        data: post_data,
+        dataType: 'json',
+        type: 'POST',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
+        },
+        contentType: 'application/json',
+        success: function (data) { handlePostVoteResponse(data) },
+        error: OnError
+    });
+}
 
 function post_title(server_url, post_data) {
     logit('url: ' + server_url);
@@ -34,6 +72,22 @@ function post_title(server_url, post_data) {
         },
         contentType: 'application/json',
         success: function (data) { handlePostTitleResponse(data) },
+        error: OnError
+    });
+}
+
+function request_create(server_url) {
+    logit('url: ' + server_url);
+    $.ajax({
+        url: server_url,
+        type: 'POST',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
+        },
+        dataType: 'json',
+        crossDomain: true,
+        jsonp: false,
+        success: function (data) { handleCreateResponse(data) },
         error: OnError
     });
 }
@@ -64,6 +118,23 @@ function handleJoinResponse(data) {
     $('#lblTitle').html(data.title);
 }
 
+function handlePostVoteResponse(data) {
+    var x = 'id: ' + data.id + ', title: ' + data.title + ', votes: ' + dump_duct(data.votes);
+    logit('Vote response: ' + x);
+}
+
+function dump_duct(d) {
+    result = "";
+    $.map(d, function(value, key){
+        result += key + '=' + value + '; '
+    });
+    return result
+}
+
+function handleCreateResponse(data) {
+    logit('New id: ' + data.id);
+}
+
 function handlePostTitleResponse(data) {
     $('#lblTitle').html(data.title);
 }
@@ -91,5 +162,10 @@ function OnError(xhr, errorType, exception) {
         responseText = xhr.responseText;
         $("#error_details").html(responseText);
     }
+    // Make sure error section is visible
+    $("#error_details").css('visibility', 'visible');
+}
 
+function clear_error(){
+    $("#error_details").html('').css('visibility', 'hidden');
 }

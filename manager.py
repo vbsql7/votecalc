@@ -34,7 +34,7 @@ class Manager:
 
 def generate_session_id(self):
     """Generate a random id and check that it has not been used yet.
-    Make it easy to remember and rely verbally. Format: AA##
+    Make it easy to remember and relay verbally. Format: AA##. Example: BK78.
     """
     while True:
         sid = ""

@@ -12,7 +12,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
         <!-- Custom jQuery and javascript for this app -->
-        <script src="vc_scripts.js"></script>
+        <script src="index_scripts.js"></script>
     </head>
 
     <body>
@@ -30,17 +30,36 @@
         </div>
 
         <div class="row">
-            <h3>UPDATE</h3>
+            <h3>SET TITLE</h3>
             <span class="col-md-4">Title:</span>
             <span class="col-md-4"><input class="col" id="txtTitle" value="TEST TITLE" type="text"/></span>
             <span class="col-md-4"><input id="btnSetTitle" type="button" value="Set Title" /></span>
         </div>
 
+        <div class="row">
+            <h3>CREATE</h3>
+            <span class="col-md-4"><input id="btnCreate" type="button" value="Create Session" /></span>
+        </div>
+
+        <div class="row">
+            <h3>VOTE</h3>
+            <span class="col-md-4">User:</span>
+            <span class="col-md-4"><input class="col" id="txtUser" value="Michael" type="text"/></span>
+        </div>
+        <div class="row">
+            <span class="col-md-4">Vote:</span>
+            <span class="col-md-4"><input class="col" id="txtVote" value="5" type="text"/></span>
+            <span class="col-md-4"><input id="btnVote" type="button" value="Vote" /></span>
+        </div>
+        <hr />
         <div class="row" id="Log">
             <h3>LOG</h3>
             <span class="col">no test data yet</span>
         </div>
-        <div class="alert alert-warning" id="error_details"></div>
+
+        <div class="alert alert-warning" id="error_details">
+            <h3>ERROR</h3>
+        </div>
     </div>
 
     </body>
