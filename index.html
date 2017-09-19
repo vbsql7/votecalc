@@ -3,6 +3,8 @@
     <head>
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
         <!-- Bootstrap -->
         <!-- Latest compiled and minified CSS -->
@@ -19,42 +21,72 @@
     <div class="container">
 
         <div class="row">
-            <h3>JOIN</h3>
-            <span class="col-md-4">Session Number:</span>
-            <span class="col-md-4"><input class="col" id="txtSession" value="FS68" type="text"/><span class="invisible" id="lblSessionId">nnnnnn</span></span>
-            <span class="col-md-4"><input id="btnJoin" type="button" value="Join" /></span>
-        </div>
-        <div class="row">
-            <span class="col-md-4">Title:</span>
-            <span class="col-md-4" id="lblTitle">Join session to see title</span>
+            <div class="col-md-3">
+                <div><b>CREATE SESSION</b></div>
+                <div><input id="btnCreate" type="button" value="Create Session" /></div>
+            </div>
+            <div class="col-md-6">
+                <div class="row well">
+                    <div>
+                        <b>MY SESSION</b>
+                    </div>
+                    <div>
+                        <span>Session #: </span>
+                        <span id="lblSessionId">nnnnnn</span>
+                    </div>
+                    <div>
+                        <span>Title: </span>
+                        <span id="lblTitle">not joined yet</span>
+                    </div>
+                    <hr />
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody id="votes">
+                            <tr><td>no votes yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+
+            </div>
         </div>
 
-        <div class="row">
-            <h3>SET TITLE</h3>
-            <span class="col-md-4">Title:</span>
-            <span class="col-md-4"><input class="col" id="txtTitle" value="TEST TITLE" type="text"/></span>
-            <span class="col-md-4"><input id="btnSetTitle" type="button" value="Set Title" /></span>
+        <div class="row well">
+            <div class="col-md-9" id="rowJoin">
+                <div><b>JOIN SESSION</b></div>
+                <div class="col-md-3">Session Number: </div>
+                <div class="col-md-3"><input id="txtSession" type="text"/></div>
+                <div class="col-md-3"><input id="btnJoin" type="button" value="Join" /></div>
+            </div>
+            <div class="col-md-3"></div>
         </div>
 
-        <div class="row">
-            <h3>CREATE</h3>
-            <span class="col-md-4"><input id="btnCreate" type="button" value="Create Session" /></span>
+        <div class="row well">
+            <div><b>SET TITLE</b></div>
+            <div class="col-md-3">Title:</div>
+            <div class="col-md-3"><input class="col" id="txtTitle" value="TEST TITLE" type="text"/></div>
+            <div class="col-md-3"><input id="btnSetTitle" type="button" value="Set Title" /></div>
         </div>
 
-        <div class="row">
-            <h3>VOTE</h3>
-            <span class="col-md-4">User:</span>
-            <span class="col-md-4"><input class="col" id="txtUser" value="Michael" type="text"/></span>
+        <div class="row well">
+            <div class="row">
+                <div><b>CAST VOTE</b></div>
+                <div class="col-md-3">User:</div>
+                <div class="col-md-3"><input class="col" id="txtUser" value="Michael" type="text"/></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">Vote:</div>
+                <div class="col-md-3"><input class="col" id="txtVote" value="7" type="text"/></div>
+                <div class="col-md-3"><input id="btnVote" type="button" value="Vote" /></div>
+            </div>
         </div>
-        <div class="row">
-            <span class="col-md-4">Vote:</span>
-            <span class="col-md-4"><input class="col" id="txtVote" value="5" type="text"/></span>
-            <span class="col-md-4"><input id="btnVote" type="button" value="Vote" /></span>
-        </div>
+
         <hr />
+
         <div class="row" id="Log">
-            <h3>LOG</h3>
-            <span class="col">no test data yet</span>
         </div>
 
         <div class="alert alert-warning" id="error_details">

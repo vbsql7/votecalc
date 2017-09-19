@@ -7,6 +7,11 @@ function WireEvents(){
     $('#btnSetTitle').click( do_set_title_button );
     $('#btnCreate').click( do_create_button );
     $('#btnVote').click( do_vote_button );
+    $('#txtSession').blur(function() {
+        // Force to upper case
+        var x = $('#txtSession').val();
+        $('#txtSession').val(x.toUpperCase());
+    });
     clear_error();
 };
 
@@ -109,27 +114,41 @@ function request_join(server_url) {
 }
 
 function handleJoinResponse(data) {
-    // Hide session input box
-    $('#txtSession').css('visibility', 'hidden')
-    $('#btnJoin').css('visibility', 'hidden')
+    // Hide session input row
+    $('#rowJoin').css('visibility', 'hidden')
     // Show data retrieved
     $('#lblSessionId').html(data.id);
-    $('#lblSessionId').css('visibility','visible');
     $('#lblTitle').html(data.title);
 }
 
 function handlePostVoteResponse(data) {
-    var x = 'id: ' + data.id + ', title: ' + data.title + ', votes: ' + dump_duct(data.votes);
-    logit('Vote response: ' + x);
+    show_votes(data.votes);
 }
 
-function dump_duct(d) {
-    result = "";
-    $.map(d, function(value, key){
-        result += key + '=' + value + '; '
+function show_votes(d) {
+    result = "<tr><th>User</th><th>Vote</th></tr>";
+    total = 0;
+    votes = 0;
+    $.map(d, function(vote, user){
+        result +='<tr><td>' + user + '</td><td>' + vote + '</td></tr>';
+        if ($.isNumeric(vote)){
+            total += parseInt(vote);
+            votes += 1;
+        }
     });
-    return result
+    if(votes > 0) {
+        avg = (total/votes).toFixed(2);
+    } else {
+        avg = total;
+    }
+    result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + avg.toString() + '</span></b></td></tr>';
+    $('#votes').html(result);
+    // Briefly highlight the total
+    $( "#lblAverage" ).effect("shake", {times:2}, 500);
+    $( "#lblAverage" ).effect("highlight", 1000);
+
 }
+
 
 function handleCreateResponse(data) {
     logit('New id: ' + data.id);
@@ -146,7 +165,7 @@ function make_base_auth(user, password) {
 }
 
 function logit(msg) {
-    $('#Log').append('<br/>' + msg);
+    $('#Log').prepend(msg + '<br/>');
 }
 
 function OnError(xhr, errorType, exception) {
