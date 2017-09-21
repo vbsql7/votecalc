@@ -1,5 +1,7 @@
 // Custom scripts for application
 
+const BASE_URL = "http://localhost:5000"
+
 $(document).ready( WireEvents );
 
 function WireEvents(){
@@ -7,6 +9,7 @@ function WireEvents(){
     $('#btnSetTitle').click( do_set_title_button );
     $('#btnCreate').click( do_create_button );
     $('#btnVote').click( do_vote_button );
+    $('#btnShare').click( do_share_button );
     $('#txtSession').blur(function() {
         // Force to upper case
         var x = $('#txtSession').val();
@@ -18,7 +21,7 @@ function WireEvents(){
 function do_join_button(){
     clear_error();
     var s = $('#txtSession').val();
-    var url = "http://localhost:5000/votecalc/session/" + s;
+    var url = BASE_URL + "/votecalc/session/" + s;
     request_join(url);
 };
 
@@ -27,7 +30,7 @@ function do_set_title_button(){
     var s = $('#txtSession').val();
     var title_text = $('#txtTitle').val();
     var post_data = JSON.stringify({title: title_text});
-    var url = "http://localhost:5000/votecalc/session/" + s;
+    var url = BASE_URL + "/votecalc/session/" + s;
     post_title(url, post_data);
 };
 
@@ -36,15 +39,25 @@ function do_vote_button(){
     var this_username = $('#txtUser').val();
     var this_vote = $('#txtVote').val();
     var session_id = $('#lblSessionId').html();
-    var url = "http://localhost:5000/votecalc/session/" + session_id + "/vote";
+    var url = BASE_URL + "/votecalc/session/" + session_id + "/vote";
     data = JSON.stringify({username: this_username, vote: this_vote});
     post_vote(url, data);
 };
 
 function do_create_button(){
+    // Create a new session
     clear_error();
-    var url = "http://localhost:5000/votecalc/session/new";
+    var url = BASE_URL + "/votecalc/session/new";
     request_create(url);
+};
+
+function do_share_button(){
+    // Populate a text box with the share link, make it visible and select it for the user to easily copy
+    var url = BASE_URL + "/votecalc/join/" + $('#lblSessionId').text()
+    $('#txtShare').css('visibility', 'visible')
+    $('#txtShare').val(url)
+    $('#txtShare').focus()
+    $('#txtShare').select()
 };
 
 function post_vote(server_url, post_data) {
@@ -55,9 +68,6 @@ function post_vote(server_url, post_data) {
         data: post_data,
         dataType: 'json',
         type: 'POST',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
-        },
         contentType: 'application/json',
         success: function (data) { handlePostVoteResponse(data) },
         error: OnError
@@ -72,9 +82,6 @@ function post_title(server_url, post_data) {
         data: post_data,
         dataType: 'json',
         type: 'PUT',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
-        },
         contentType: 'application/json',
         success: function (data) { handlePostTitleResponse(data) },
         error: OnError
@@ -86,9 +93,6 @@ function request_create(server_url) {
     $.ajax({
         url: server_url,
         type: 'POST',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
-        },
         dataType: 'json',
         crossDomain: true,
         jsonp: false,
@@ -97,14 +101,12 @@ function request_create(server_url) {
     });
 }
 
+
 function request_join(server_url) {
     logit('url: ' + server_url);
     $.ajax({
         url: server_url,
         type: 'GET',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', make_base_auth('voter', 'cast'));
-        },
         dataType: 'json',
         crossDomain: true,
         jsonp: false,
@@ -158,15 +160,10 @@ function handlePostTitleResponse(data) {
     $('#lblTitle').html(data.title);
 }
 
-function make_base_auth(user, password) {
-    var tok = user + ':' + password;
-    var hash = btoa(tok);
-    return 'Basic ' + hash;
-}
-
 function logit(msg) {
     $('#Log').prepend(msg + '<br/>');
 }
+
 
 function OnError(xhr, errorType, exception) {
     var responseText;

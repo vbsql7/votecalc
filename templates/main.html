@@ -2,7 +2,7 @@
 <html>
     <head>
         <style>
-            body, p, div { font-size: 12pt; }
+            body, p, div { font-size: 14pt; }
         </style>
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
         <!-- Custom jQuery and javascript for this app -->
-        <script src="index_scripts.js"></script>
+        <script src="main_scripts.js"></script>
     </head>
 
     <body>
@@ -26,22 +26,18 @@
             <center><h2>VoteCalc</h2></center>
         </div>
         <div class="row">
-            <div class="col-md-3">
-                <div><b>CREATE SESSION</b></div>
-                <div><input id="btnCreate" type="button" value="New" /></div>
-            </div>
             <div class="col-md-6">
                 <div class="row well">
                     <div>
-                        <b>MY SESSION</b>
+                        <b>SESSION</b>
                     </div>
                     <div>
                         <span>Session #: </span>
-                        <span id="lblSessionId">nnnnnn</span>
+                        <span id="lblSessionId">{{ session_id }}</span>
                     </div>
                     <div>
                         <span>Title: </span>
-                        <span id="lblTitle">not joined yet</span>
+                        <span id="lblTitle">{{ title }}</span>
                     </div>
                     <hr />
                     <div class="table-responsive">
@@ -54,27 +50,8 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <input type="button" id="btnShare" value="Share" />
-                <input type="text" id="txtShare" style="visibility:hidden;" />
-            </div>
-        </div>
 
-        <div class="row well">
-            <div class="col-md-9" id="rowJoin">
-                <h4>JOIN</h4>
-                <div class="col-md-3">Session Number: </div>
-                <div class="col-md-4"><input id="txtSession" type="text"/></div>
-                <div class="col-md-2"><input id="btnJoin" type="button" value="Join" /></div>
             </div>
-            <div class="col-md-3"> </div>
-        </div>
-
-        <div class="row well">
-            <h4>TITLE</h4>
-            <div class="col-md-2">Title:</div>
-            <div class="col-md-4"><input class="col" id="txtTitle" value="TEST TITLE" type="text"/></div>
-            <div class="col-md-2"><input id="btnSetTitle" type="button" value="Update Title" /></div>
-            <div class="col-md-4"> </div>
         </div>
 
         <div class="row well">

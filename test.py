@@ -48,14 +48,6 @@ class SessionTest(unittest.TestCase):
             counter += 1
         self.assertGreater(counter, 0)
 
-    def test_d_delete(self):
-        """Test the DELETE function by deleting a specific session."""
-        print('\nTESTING DELETE')
-        url = self.base_url + "votecalc/session/" + self.session_id
-        result = requests.delete(url)
-        # Delete returns True if object was found and deleted
-        self.assertTrue(result)
-
 
 def create_session():
     """Create a new session."""
