@@ -1,9 +1,6 @@
 <!doctype html>
 <html>
     <head>
-        <style>
-            body, p, div { font-size: 12pt; }
-        </style>
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -16,8 +13,14 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
+        <!-- Socket io library for use with Flask-SocketIO -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
         <!-- Custom jQuery and javascript for this app -->
-        <script src="index_scripts.js"></script>
+        <script src="{{ url_for('static', filename='index_scripts.js')}}"></script>
+
+        <!-- Custom style sheet for this app -->
+        <link rel="{{ url_for('static', filename='vc_styles.css')}}">
     </head>
 
     <body>
@@ -25,23 +28,30 @@
         <div class="row">
             <center><h2>VoteCalc</h2></center>
         </div>
-        <div class="row">
+        <div class="form-group row">
+            <div class="form-inline">
+                <div><b>Start New Session</b></div>
+                <div><button class="btn" id="btnCreate">New</button></div>
+            </div>
             <div class="col-md-3">
-                <div><b>CREATE SESSION</b></div>
-                <div><input id="btnCreate" type="button" value="New" /></div>
+                <label for="txtSession">Join Session: </div>
+                <input class="form-control" id="txtSession" type="text"/>
+                <button id="btnJoin" class="btn">Join</button>
             </div>
             <div class="col-md-6">
                 <div class="row well">
                     <div>
                         <b>MY SESSION</b>
                     </div>
-                    <div>
-                        <span>Session #: </span>
-                        <span id="lblSessionId">nnnnnn</span>
+                    <div class="form-group row">
+                        <label for="lblSessionId">Session #: </label>
+                        <span id="lblSessionId" class="form-control-static">nnnnnn</span>
+                        <label for="lblStatus">Status: </label>
+                        <span id="lblStatus" class="form-control-static">not connected</span>
                     </div>
                     <div>
-                        <span>Title: </span>
-                        <span id="lblTitle">not joined yet</span>
+                        <label for="lblTitle">Title: </label>
+                        <span id="lblTitle" class="form-control-static">none</span>
                     </div>
                     <hr />
                     <div class="table-responsive">
@@ -54,26 +64,16 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <input type="button" id="btnShare" value="Share" />
+                <button class="btn" id="btnShare">Share</button>
                 <input type="text" id="txtShare" style="visibility:hidden;" />
             </div>
-        </div>
-
-        <div class="row well">
-            <div class="col-md-9" id="rowJoin">
-                <h4>JOIN</h4>
-                <div class="col-md-3">Session Number: </div>
-                <div class="col-md-4"><input id="txtSession" type="text"/></div>
-                <div class="col-md-2"><input id="btnJoin" type="button" value="Join" /></div>
-            </div>
-            <div class="col-md-3"> </div>
         </div>
 
         <div class="row well">
             <h4>TITLE</h4>
             <div class="col-md-2">Title:</div>
             <div class="col-md-4"><input class="col" id="txtTitle" value="TEST TITLE" type="text"/></div>
-            <div class="col-md-2"><input id="btnSetTitle" type="button" value="Update Title" /></div>
+            <div class="col-md-2"><button id="btnSetTitle" class="btn">Update Title</button></div>
             <div class="col-md-4"> </div>
         </div>
 
@@ -84,7 +84,7 @@
                 <div class="col-md-3"><input class="col" id="txtUser" value="Michael" type="text"/></div>
                 <div class="col-md-1">Vote:</div>
                 <div class="col-md-3"><input class="col" id="txtVote" value="7" type="text"/></div>
-                <div class="col-md-2"><input id="btnVote" type="button" value="Cast Vote" /></div>
+                <div class="col-md-2"><button id="btnVote" class="btn btn-primary">Cast Vote</button></div>
             </div>
         </div>
 

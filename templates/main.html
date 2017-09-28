@@ -1,9 +1,6 @@
 <!doctype html>
 <html>
     <head>
-        <style>
-            body, p, div { font-size: 14pt; }
-        </style>
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -16,8 +13,14 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
+        <!-- Socket io library for use with Flask-SocketIO -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
         <!-- Custom jQuery and javascript for this app -->
-        <script src="main_scripts.js"></script>
+        <script src="{{ url_for('static', filename='main_scripts.js')}}"></script>
+
+        <!-- Custom style sheet for this app -->
+        <link rel="{{ url_for('static', filename='vc_styles.css')}}">
     </head>
 
     <body>
@@ -32,12 +35,12 @@
                         <b>SESSION</b>
                     </div>
                     <div>
-                        <span>Session #: </span>
-                        <span id="lblSessionId">{{ session_id }}</span>
+                        <span class="field-label">Session #: </span>
+                        <span id="lblSessionId" class="data-field">{{ session_id }}</span>
                     </div>
                     <div>
-                        <span>Title: </span>
-                        <span id="lblTitle">{{ title }}</span>
+                        <span class="field-label">Title: </span>
+                        <span id="lblTitle" class="data-field">{{ title }}</span>
                     </div>
                     <hr />
                     <div class="table-responsive">
@@ -61,7 +64,7 @@
                 <div class="col-md-3"><input class="col" id="txtUser" value="Michael" type="text"/></div>
                 <div class="col-md-1">Vote:</div>
                 <div class="col-md-3"><input class="col" id="txtVote" value="7" type="text"/></div>
-                <div class="col-md-2"><input id="btnVote" type="button" value="Cast Vote" /></div>
+                <div class="col-md-2"><button id="btnVote" class="btn btn-primary">Cast Vote</button></div>
             </div>
         </div>
 

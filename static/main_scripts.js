@@ -2,54 +2,64 @@
 
 const BASE_URL = "http://localhost:5000"
 
+var socket = "";
+
 $(document).ready( WireEvents );
 
 function WireEvents(){
     $('#btnVote').click( do_vote_button );
     clear_error();
+
+    // Connect through web socket to server, supplying session id as namespace
+    socket = io.connect(BASE_URL);
+
+    socket.on('joined', function(data) {
+        $('#lblStatus').html('Connected');
+
+    });
+
+    socket.on('change', function(data) {
+        // Update different things based on the type of change sent
+        switch (data.change_type) {
+            case "title":
+                $('#lblTitle').html(data.title);
+                break;
+            case "votes":
+                show_votes(data.votes)
+                break;
+        }
+
+    });
+
+    room = $('#lblSessionId').text();
+    socket.emit('join', {room: room});
+
 };
 
 function do_vote_button(){
     clear_error();
+    var this_room = $('#lblSessionId').text();
     var this_username = $('#txtUser').val();
     var this_vote = $('#txtVote').val();
-    var session_id = $('#lblSessionId').html();
-    var url = BASE_URL + "/votecalc/session/" + session_id + "/vote";
-    data = JSON.stringify({username: this_username, vote: this_vote});
-    post_vote(url, data);
+    data = {room: this_room, username: this_username, vote: this_vote};
+    socket.emit('vote', data);
 };
 
-function post_vote(server_url, post_data) {
-    logit('url: ' + server_url);
-    logit('data: ' + post_data);
-    $.ajax({
-        url: server_url,
-        data: post_data,
-        dataType: 'json',
-        type: 'POST',
-        contentType: 'application/json',
-        success: function (data) { handlePostVoteResponse(data) },
-        error: OnError
-    });
-}
 
-function handlePostVoteResponse(data) {
-    show_votes(data.votes);
-}
 
-function show_votes(d) {
+function show_votes(votes) {
     result = "<tr><th>User</th><th>Vote</th></tr>";
     total = 0;
-    votes = 0;
-    $.map(d, function(vote, user){
+    vote_count = 0;
+    $.map(votes, function(vote, user){
         result +='<tr><td>' + user + '</td><td>' + vote + '</td></tr>';
         if ($.isNumeric(vote)){
             total += parseInt(vote);
-            votes += 1;
+            vote_count += 1;
         }
     });
-    if(votes > 0) {
-        avg = (total/votes).toFixed(2);
+    if(vote_count > 0) {
+        avg = (total/vote_count).toFixed(2);
     } else {
         avg = total;
     }
@@ -58,13 +68,6 @@ function show_votes(d) {
     // Briefly highlight the total
     $( "#lblAverage" ).effect("shake", {times:2}, 500);
     $( "#lblAverage" ).effect("highlight", 1000);
-
-}
-
-function make_base_auth(user, password) {
-    var tok = user + ':' + password;
-    var hash = btoa(tok);
-    return 'Basic ' + hash;
 }
 
 

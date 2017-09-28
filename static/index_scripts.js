@@ -1,6 +1,8 @@
 // Custom scripts for application
 
-const BASE_URL = "http://localhost:5000"
+const BASE_URL = "http://localhost:5000"  // Will be http://votecalc.com
+
+var socket = "";
 
 $(document).ready( WireEvents );
 
@@ -10,83 +12,89 @@ function WireEvents(){
     $('#btnCreate').click( do_create_button );
     $('#btnVote').click( do_vote_button );
     $('#btnShare').click( do_share_button );
-    $('#txtSession').blur(function() {
-        // Force to upper case
-        var x = $('#txtSession').val();
-        $('#txtSession').val(x.toUpperCase());
-    });
+    $('#txtSession').blur( force_id_uppercase );
+
     clear_error();
+
+    // Connect through web socket to server, supplying session id as namespace
+    socket = io.connect(BASE_URL);
+
+    socket.on('server_connect', function (msg) {
+        logit('Server connected');
+    });
+
+    socket.on('joined', function(data) {
+        $('#lblSessionId').html(data.room);
+        $('#lblTitle').html(data.title);
+        $('#lblStatus').html('Connected');
+
+        // Hide session input row
+        $('#rowJoin').css('visibility', 'hidden')
+
+    });
+
+    socket.on('change', function(data) {
+        // Update different things based on the type of change sent
+        switch (data.change_type) {
+            case "title":
+                $('#lblTitle').html(data.title);
+                break;
+            case "votes":
+                show_votes(data.votes)
+                break;
+        }
+
+    });
+};
+
+function force_id_uppercase() {
+    var x = $('#txtSession').val();
+    $('#txtSession').val(x.toUpperCase());
 };
 
 function do_join_button(){
     clear_error();
-    var s = $('#txtSession').val();
-    var url = BASE_URL + "/votecalc/session/" + s;
-    request_join(url);
+    var session_id = $('#txtSession').val();
+    logit('join room ' + session_id);
+    socket.emit('join', {room: session_id});
 };
+
 
 function do_set_title_button(){
     clear_error();
-    var s = $('#txtSession').val();
+    room = $('#lblSessionId').text();
     var title_text = $('#txtTitle').val();
-    var post_data = JSON.stringify({title: title_text});
-    var url = BASE_URL + "/votecalc/session/" + s;
-    post_title(url, post_data);
+    logit('Send title change');
+    socket.emit('update', {room: room, title: title_text});
 };
 
 function do_vote_button(){
     clear_error();
+    var this_room = $('#lblSessionId').text();
     var this_username = $('#txtUser').val();
     var this_vote = $('#txtVote').val();
-    var session_id = $('#lblSessionId').html();
-    var url = BASE_URL + "/votecalc/session/" + session_id + "/vote";
-    data = JSON.stringify({username: this_username, vote: this_vote});
-    post_vote(url, data);
+    data = {room: this_room, username: this_username, vote: this_vote};
+    logit('Send vote for ' + JSON.stringify(data));
+    socket.emit('vote', data);
 };
 
 function do_create_button(){
     // Create a new session
     clear_error();
-    var url = BASE_URL + "/votecalc/session/new";
+    var url = BASE_URL + "/session/new";
     request_create(url);
 };
 
 function do_share_button(){
     // Populate a text box with the share link, make it visible and select it for the user to easily copy
-    var url = BASE_URL + "/votecalc/join/" + $('#lblSessionId').text()
+    var url = BASE_URL + "/join/" + $('#lblSessionId').text()
     $('#txtShare').css('visibility', 'visible')
     $('#txtShare').val(url)
     $('#txtShare').focus()
     $('#txtShare').select()
 };
 
-function post_vote(server_url, post_data) {
-    logit('url: ' + server_url);
-    logit('data: ' + post_data);
-    $.ajax({
-        url: server_url,
-        data: post_data,
-        dataType: 'json',
-        type: 'POST',
-        contentType: 'application/json',
-        success: function (data) { handlePostVoteResponse(data) },
-        error: OnError
-    });
-}
 
-function post_title(server_url, post_data) {
-    logit('url: ' + server_url);
-    logit('data: ' + post_data);
-    $.ajax({
-        url: server_url,
-        data: post_data,
-        dataType: 'json',
-        type: 'PUT',
-        contentType: 'application/json',
-        success: function (data) { handlePostTitleResponse(data) },
-        error: OnError
-    });
-}
 
 function request_create(server_url) {
     logit('url: ' + server_url);
@@ -102,44 +110,19 @@ function request_create(server_url) {
 }
 
 
-function request_join(server_url) {
-    logit('url: ' + server_url);
-    $.ajax({
-        url: server_url,
-        type: 'GET',
-        dataType: 'json',
-        crossDomain: true,
-        jsonp: false,
-        success: function (data) { handleJoinResponse(data) },
-        error: OnError
-    });
-}
-
-function handleJoinResponse(data) {
-    // Hide session input row
-    $('#rowJoin').css('visibility', 'hidden')
-    // Show data retrieved
-    $('#lblSessionId').html(data.id);
-    $('#lblTitle').html(data.title);
-}
-
-function handlePostVoteResponse(data) {
-    show_votes(data.votes);
-}
-
-function show_votes(d) {
+function show_votes(votes) {
     result = "<tr><th>User</th><th>Vote</th></tr>";
     total = 0;
-    votes = 0;
-    $.map(d, function(vote, user){
+    vote_count = 0;
+    $.map(votes, function(vote, user){
         result +='<tr><td>' + user + '</td><td>' + vote + '</td></tr>';
         if ($.isNumeric(vote)){
             total += parseInt(vote);
-            votes += 1;
+            vote_count += 1;
         }
     });
-    if(votes > 0) {
-        avg = (total/votes).toFixed(2);
+    if(vote_count > 0) {
+        avg = (total/vote_count).toFixed(2);
     } else {
         avg = total;
     }
@@ -151,13 +134,9 @@ function show_votes(d) {
 
 }
 
-
 function handleCreateResponse(data) {
-    logit('New id: ' + data.id);
-}
-
-function handlePostTitleResponse(data) {
-    $('#lblTitle').html(data.title);
+    $('#txtSession').val(data.id);
+    do_join_button();
 }
 
 function logit(msg) {

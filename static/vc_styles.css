@@ -1,0 +1,11 @@
+body, p, div {
+    font-size: 12pt;
+}
+.field-label {
+    margin: 10px;
+}
+
+.data-field {
+    margin: 10px;
+    font-weight: bold;
+}
