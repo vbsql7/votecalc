@@ -28,30 +28,28 @@
         <div class="row">
             <center><h2>VoteCalc</h2></center>
         </div>
-        <div class="form-group row">
-            <div class="form-inline">
-                <div><b>Start New Session</b></div>
-                <div><button class="btn" id="btnCreate">New</button></div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <div><b>Start New Session</b></div>
+                    <div><button class="btn" id="btnCreate">New</button></div>
+                    <label for="txtSession" >Join Session: </label>
+                    <input class="form-control" id="txtSession" type="text"/>
+                    <button id="btnJoin" class="btn">Join</button>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label for="txtSession">Join Session: </div>
-                <input class="form-control" id="txtSession" type="text"/>
-                <button id="btnJoin" class="btn">Join</button>
-            </div>
-            <div class="col-md-6">
+            <div class="form-group col-md-7">
                 <div class="row well">
+                    <h3>SESSION</h3>
                     <div>
-                        <b>MY SESSION</b>
-                    </div>
-                    <div class="form-group row">
                         <label for="lblSessionId">Session #: </label>
                         <span id="lblSessionId" class="form-control-static">nnnnnn</span>
-                        <label for="lblStatus">Status: </label>
-                        <span id="lblStatus" class="form-control-static">not connected</span>
                     </div>
+                    <hr />
                     <div>
-                        <label for="lblTitle">Title: </label>
-                        <span id="lblTitle" class="form-control-static">none</span>
+                        <label for="txtTitle">Title: </label>
+                        <input class="form-control" id="txtTitle" type="text"/>
+                        <button id="btnSetTitle" class="btn">Update</button>
                     </div>
                     <hr />
                     <div class="table-responsive">
@@ -66,25 +64,15 @@
             <div class="col-md-3">
                 <button class="btn" id="btnShare">Share</button>
                 <input type="text" id="txtShare" style="visibility:hidden;" />
-            </div>
-        </div>
 
-        <div class="row well">
-            <h4>TITLE</h4>
-            <div class="col-md-2">Title:</div>
-            <div class="col-md-4"><input class="col" id="txtTitle" value="TEST TITLE" type="text"/></div>
-            <div class="col-md-2"><button id="btnSetTitle" class="btn">Update Title</button></div>
-            <div class="col-md-4"> </div>
-        </div>
+                <div class="well form-group">
+                    <label for="txtUser">User:</label>
+                    <input class="form-control" id="txtUser" placeholder="name" type="text"/>
+                    <label for="txtVote">Vote:</label>
+                    <input class="form-control" id="txtVote" placeholder="##" type="text"/>
+                    <button id="btnVote" class="btn">Cast Votes</button>
+                </div>
 
-        <div class="row well">
-            <div class="row">
-                <h4>VOTE</h4>
-                <div class="col-md-1">User:</div>
-                <div class="col-md-3"><input class="col" id="txtUser" value="Michael" type="text"/></div>
-                <div class="col-md-1">Vote:</div>
-                <div class="col-md-3"><input class="col" id="txtVote" value="7" type="text"/></div>
-                <div class="col-md-2"><button id="btnVote" class="btn btn-primary">Cast Vote</button></div>
             </div>
         </div>
 

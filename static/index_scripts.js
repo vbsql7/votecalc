@@ -25,8 +25,7 @@ function WireEvents(){
 
     socket.on('joined', function(data) {
         $('#lblSessionId').html(data.room);
-        $('#lblTitle').html(data.title);
-        $('#lblStatus').html('Connected');
+        $('#txtTitle').val(data.title);
 
         // Hide session input row
         $('#rowJoin').css('visibility', 'hidden')
@@ -37,7 +36,7 @@ function WireEvents(){
         // Update different things based on the type of change sent
         switch (data.change_type) {
             case "title":
-                $('#lblTitle').html(data.title);
+                // $('#txtTitle').val(data.title); --- Host should not receive title changes
                 break;
             case "votes":
                 show_votes(data.votes)
@@ -83,6 +82,8 @@ function do_create_button(){
     clear_error();
     var url = BASE_URL + "/session/new";
     request_create(url);
+    $('#btnCreate').prop('disabled', true)
+
 };
 
 function do_share_button(){
@@ -92,6 +93,8 @@ function do_share_button(){
     $('#txtShare').val(url)
     $('#txtShare').focus()
     $('#txtShare').select()
+    $('#btnShare').prop('disabled', true)
+
 };
 
 
