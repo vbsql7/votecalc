@@ -72,7 +72,7 @@ def join_session(message):
         else:
             join_room(rm)
             debugmsg('Server joined room: ' + rm)
-            data = {"room": rm, "title": sess.title}
+            data = {"room": rm, "title": sess.title, "votes": sess.votes}
             emit('joined', data, room=rm)
     except:
         debugmsg('Error during join_session: ' + str(sys.exc_info()[0]))
@@ -96,10 +96,25 @@ def update_session(data):
         raise
 
 
+@socketio.on('reset')
+def reset_session(data):
+    """Reset the votes in given session (room)"""
+    try:
+        debugmsg('RESET EVENT')
+        rm = data['room']
+        sess = session_manager.get_session(rm)
+        if sess is None:
+            abort(404)
+        sess.reset()
+        emit('change', {"change_type": 'votes', "votes": sess.votes}, room=rm)
+    except:
+        debugmsg('Error during reset_session: ' + str(sys.exc_info()[0]))
+        raise
 
-@app.route('/favicon.ico')
-def ignore():
-    pass
+
+@app.route('/favicon.ico', methods=['GET'])
+def get_favicon():
+    return url_for('static', filename='favicon.ico')
 
 
 @app.route('/sessions', methods=['GET'])
@@ -121,7 +136,7 @@ def join_session(session_id):
         if sess is None:
             abort(404)
         else:
-            return render_template('main.html', session_id=session_id, title=sess.title)
+            return render_template('remote.html', session_id=session_id, title=sess.title)
     except:
         debugmsg('ERROR DURING JOIN get_session: ' + str(sys.exc_info()[0]))
         raise
@@ -146,6 +161,7 @@ def create_session():
     """Create a new session."""
     try:
         sess = session_manager.create_session()
+        debugmsg('Created session ' + sess.id)
         return jsonify({'id': sess.id}), 201
     except:
         debugmsg('Error during create_session: ' + str(sys.exc_info()[0]))
@@ -155,6 +171,7 @@ def create_session():
 
 def delete_session(session_id):
     """Delete a session. Used by automatic housekeeping. Never by users."""
+    # TODO: Replace with periodic task to remove idle sessions.
     try:
         sess = session_manager.get_session(session_id)
         if sess is None:
@@ -165,26 +182,6 @@ def delete_session(session_id):
         debugmsg('Error during delete_session: ' + str(sys.exc_info()[0]))
         raise
 
-
-@app.route('/session/<session_id>/vote', methods=['POST'])
-def add_vote(session_id):
-    """Cast one user vote for a given session."""
-    if not request.is_json:
-        abort(400)
-    try:
-        sess = session_manager.get_session(session_id)
-        if sess is None:
-            abort(404)
-        # Extract incoming json object
-        data = request.json
-        username = data['username']
-        vote = data['vote']
-        # Tell session to add or update one vote
-        sess.add_vote(username, vote)
-        return jsonpickle.encode(sess, unpicklable=False)
-    except:
-        debugmsg('Error during vote: ' + str(sys.exc_info()[0]))
-        raise
 
 
 def debugmsg(msg):

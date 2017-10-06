@@ -17,7 +17,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 
         <!-- Custom jQuery and javascript for this app -->
-        <script src="{{ url_for('static', filename='main_scripts.js')}}"></script>
+        <script src="{{ url_for('static', filename='remote_scripts.js')}}"></script>
 
         <!-- Custom style sheet for this app -->
         <link rel="{{ url_for('static', filename='vc_styles.css')}}">
@@ -26,23 +26,19 @@
     <body>
     <div class="container">
         <div class="row">
-            <center><h2>VoteCalc</h2></center>
+            <center><h2>VoteCalc - Remote</h2></center>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="form-group col-md-7">
                 <div class="row well">
-                    <div>
-                        <b>SESSION</b>
-                    </div>
                     <div>
                         <span class="field-label">Session #: </span>
                         <span id="lblSessionId" class="data-field">{{ session_id }}</span>
                     </div>
-                    <div>
-                        <span class="field-label">Title: </span>
-                        <span id="lblTitle" class="data-field">{{ title }}</span>
+                    <div style="margin-top: 10px; margin-bottom: 15px;">
+                        <h4>Title: </h4>
+                        <strong><span id="lblTitle" class="data-field">{{ title }}</span></strong>
                     </div>
-                    <hr />
                     <div class="table-responsive">
                         <table class="table">
                             <tbody id="votes">
@@ -54,23 +50,17 @@
             </div>
             <div class="col-md-3">
 
+                <div class="well form-group">
+                    <label for="txtUser">Name:</label>
+                    <input class="form-control" id="txtUser" placeholder="name" type="text"/>
+                    <div style="margin-top: 10px; margin-bottom: 10px;">
+                        <label for="txtVote">Vote:</label>
+                        <input class="form-control" id="txtVote" placeholder="##" type="text"/>
+                    </div>
+                    <button id="btnVote" class="btn">Cast Vote</button>
+                </div>
+
             </div>
-        </div>
-
-        <div class="row well">
-            <div class="row">
-                <h4>VOTE</h4>
-                <div class="col-md-1">User:</div>
-                <div class="col-md-3"><input class="col" id="txtUser" value="Michael" type="text"/></div>
-                <div class="col-md-1">Vote:</div>
-                <div class="col-md-3"><input class="col" id="txtVote" value="7" type="text"/></div>
-                <div class="col-md-2"><button id="btnVote" class="btn btn-primary">Cast Vote</button></div>
-            </div>
-        </div>
-
-        <hr />
-
-        <div class="row" id="Log">
         </div>
 
         <div class="alert alert-warning" id="error_details">

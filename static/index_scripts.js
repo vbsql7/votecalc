@@ -12,7 +12,13 @@ function WireEvents(){
     $('#btnCreate').click( do_create_button );
     $('#btnVote').click( do_vote_button );
     $('#btnShare').click( do_share_button );
-    $('#txtSession').blur( force_id_uppercase );
+    $('#btnReset').click( do_reset_button );
+    $('#txtSession').keyup( validate_session );
+    $('#txtVote').blur( validate_vote );
+
+    $('input[type="radio"][name=optSession]').click( do_session_choice );
+
+    do_session_choice();
 
     clear_error();
 
@@ -20,7 +26,7 @@ function WireEvents(){
     socket = io.connect(BASE_URL);
 
     socket.on('server_connect', function (msg) {
-        logit('Server connected');
+        // logit('Server connected');
     });
 
     socket.on('joined', function(data) {
@@ -46,15 +52,53 @@ function WireEvents(){
     });
 };
 
-function force_id_uppercase() {
+function do_session_choice() {
+    var choice = $('input[name=optSession]:checked').val();
+    if (choice == 'new') {
+        $('#btnCreate').prop('disabled', false);
+        $('#txtSession').prop('disabled', true);
+        $('#btnJoin').prop('disabled', true);
+    } else {
+        $('#txtSession').prop('disabled', false);
+        $('#btnCreate').prop('disabled', true);
+    }
+}
+
+function validate_session() {
     var x = $('#txtSession').val();
     $('#txtSession').val(x.toUpperCase());
+    // Enable Join if session entry looks ok
+    if ($('#txtSession').val().search(/([A-Z])([A-Z])([0-9])([0-9])/) >= 0) {
+        $('#btnJoin').prop('disabled', false);
+    } else {
+        $('#btnJoin').prop('disabled', true);
+    }
+};
+
+function validate_vote() {
+    var x = $('#txtVote').val();
+    var votes = []
+
+    if (x.indexOf(',') >= 0) {
+        votes = x.split(',');
+    } else {
+        votes = x.split(' ');
+    }
+
+    // Enable Vote if 1 or 2 digits entered
+    for (var i=0; i <= votes.length-1; i++) {
+        v = votes[i];
+        if (!Number.isInteger(parseInt(v))) {
+            alert('All votes must be numeric.');
+            break;
+        }
+    }
 };
 
 function do_join_button(){
     clear_error();
     var session_id = $('#txtSession').val();
-    logit('join room ' + session_id);
+    // logit('join room ' + session_id);
     socket.emit('join', {room: session_id});
 };
 
@@ -63,7 +107,7 @@ function do_set_title_button(){
     clear_error();
     room = $('#lblSessionId').text();
     var title_text = $('#txtTitle').val();
-    logit('Send title change');
+    // logit('Send title change');
     socket.emit('update', {room: room, title: title_text});
 };
 
@@ -73,7 +117,7 @@ function do_vote_button(){
     var this_username = $('#txtUser').val();
     var this_vote = $('#txtVote').val();
     data = {room: this_room, username: this_username, vote: this_vote};
-    logit('Send vote for ' + JSON.stringify(data));
+    // logit('Send vote for ' + JSON.stringify(data));
     socket.emit('vote', data);
 };
 
@@ -83,7 +127,7 @@ function do_create_button(){
     var url = BASE_URL + "/session/new";
     request_create(url);
     $('#btnCreate').prop('disabled', true)
-
+    $( "#btnReset" ).prop('disabled', true);
 };
 
 function do_share_button(){
@@ -100,7 +144,7 @@ function do_share_button(){
 
 
 function request_create(server_url) {
-    logit('url: ' + server_url);
+    // logit('url: ' + server_url);
     $.ajax({
         url: server_url,
         type: 'POST',
@@ -126,6 +170,8 @@ function show_votes(votes) {
     });
     if(vote_count > 0) {
         avg = (total/vote_count).toFixed(2);
+        // Enable reset button
+        $( "#btnReset" ).prop('disabled', false);
     } else {
         avg = total;
     }
@@ -138,9 +184,17 @@ function show_votes(votes) {
 }
 
 function handleCreateResponse(data) {
-    $('#txtSession').val(data.id);
-    do_join_button();
+    socket.emit('join', {room: data.id});
 }
+
+function do_reset_button() {
+    clear_error();
+    var this_room = $('#lblSessionId').text();
+    // logit('Reset ' + this_room);
+    data = {room: this_room};
+    socket.emit('reset', data);
+}
+
 
 function logit(msg) {
     $('#Log').prepend(msg + '<br/>');

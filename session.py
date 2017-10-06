@@ -12,4 +12,7 @@ class Session:
         """
         self.votes[this_username] = this_vote
 
+    def reset(self):
+        self.votes = {}
+
 

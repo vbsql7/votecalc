@@ -14,8 +14,7 @@ function WireEvents(){
     socket = io.connect(BASE_URL);
 
     socket.on('joined', function(data) {
-        $('#lblStatus').html('Connected');
-
+        show_votes(data.votes);
     });
 
     socket.on('change', function(data) {
@@ -23,6 +22,7 @@ function WireEvents(){
         switch (data.change_type) {
             case "title":
                 $('#lblTitle').html(data.title);
+                $( "#lblTitle" ).effect("highlight", 1000);
                 break;
             case "votes":
                 show_votes(data.votes)

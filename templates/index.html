@@ -26,31 +26,42 @@
     <body>
     <div class="container">
         <div class="row">
-            <center><h2>VoteCalc</h2></center>
+            <center><h2>VoteCalc - Host</h2></center>
         </div>
         <div class="row">
             <div class="col-md-2">
-                <div class="form-group">
-                    <div><b>Start New Session</b></div>
-                    <div><button class="btn" id="btnCreate">New</button></div>
-                    <label for="txtSession" >Join Session: </label>
-                    <input class="form-control" id="txtSession" type="text"/>
-                    <button id="btnJoin" class="btn">Join</button>
+                <fieldset class="form-group well">
+                   <h5>Choose Session</h5>
+                    <div class="form-group">
+                        <label><input type="radio" name="optSession" value = "new" checked="checked"> New</label>
+                        <div style="margin-top: 5px; margin-left: 20px; margin-bottom: 15px;">
+                            <button class="btn btn-default" id="btnCreate">Create</button>
+                        </div>
+                        <label><input type="radio" name="optSession" value="existing"> Existing</label>
+                        <div style="margin-left: 20px;">
+                            <div style="margin-top: 5px; margin-bottom: 5px;">
+                                <input class="form-control" style="width: 100px" id="txtSession" placeholder="aann" type="text"/>
+                            </div>
+                            <button id="btnJoin" class="btn btn-default">Join</button>
+                        </div>
+                    </div>
+                </fieldset>
+                <div style="margin-top: 20px; margin-bottom: 5px;">
+                    <button id="btnReset" class="btn btn-default">Reset Votes</button>
                 </div>
             </div>
             <div class="form-group col-md-7">
                 <div class="row well">
-                    <h3>SESSION</h3>
                     <div>
                         <label for="lblSessionId">Session #: </label>
                         <span id="lblSessionId" class="form-control-static">nnnnnn</span>
                     </div>
-                    <hr />
-                    <div>
+                    <div style="margin-top: 20px; margin-bottom: 10px;">
                         <label for="txtTitle">Title: </label>
                         <input class="form-control" id="txtTitle" type="text"/>
-                        <button id="btnSetTitle" class="btn">Update</button>
                     </div>
+                    <button id="btnSetTitle" class="btn btn-default">Update Title</button>
+
                     <hr />
                     <div class="table-responsive">
                         <table class="table">
@@ -62,15 +73,19 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <button class="btn" id="btnShare">Share</button>
-                <input type="text" id="txtShare" style="visibility:hidden;" />
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-default" id="btnShare">Share</button>
+                    <input type="text" id="txtShare" style="visibility:hidden;" />
+                </div>
 
                 <div class="well form-group">
-                    <label for="txtUser">User:</label>
+                    <label for="txtUser">Name:</label>
                     <input class="form-control" id="txtUser" placeholder="name" type="text"/>
-                    <label for="txtVote">Vote:</label>
-                    <input class="form-control" id="txtVote" placeholder="##" type="text"/>
-                    <button id="btnVote" class="btn">Cast Votes</button>
+                    <div style="margin-top: 10px; margin-bottom: 10px;">
+                        <label for="txtVote">Vote:</label>
+                        <input class="form-control" id="txtVote" placeholder="##" type="text"/>
+                    </div>
+                    <button id="btnVote" class="btn btn-default">Cast Vote</button>
                 </div>
 
             </div>
