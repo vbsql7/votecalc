@@ -50,16 +50,39 @@ def process_vote(data):
         if sess is None:
             abort(404)
         else:
-            username = data['username']
-            vote = data['vote']
-            sess.add_vote(username, vote)
-            debugmsg('VOTE received for ' + username + ': ' + vote)
+            names = data['username']
+            votes = data['vote']
+            dvotes = parse_votes(names, votes)
+            for name, vote in dvotes:
+                sess.add_vote(name, vote)
             # Send all votes to all clients in the room
-            debugmsg('Send back all votes: ' + str(sess.votes))
             emit('change', {"change_type": 'votes', "votes": sess.votes}, room=rm)
     except:
         debugmsg('Error during process_vote: ' + str(sys.exc_info()[0]))
         raise
+
+def parse_votes(names, votes):
+    dvotes = []
+    if votes.find(',') >= 0:
+        delim = ','
+    else:
+        delim = ' '
+
+    avotes = votes.split(delim)
+    anames = names.split(delim)
+
+    i = 0
+    for vote in avotes:
+        if i > len(anames) - 1:
+            name = 'unknown'
+        else:
+            name = anames[i]
+        debugmsg(name + ' voted ' + vote)
+        dvotes.append([name, vote])
+        i += 1
+
+    return dvotes
+
 
 
 @socketio.on('join')
