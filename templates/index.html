@@ -45,23 +45,39 @@
                         </div>
                     </div>
                 </fieldset>
-                <div style="margin-top: 20px; margin-bottom: 5px;">
+                <fieldset class="form-group well">
+                  <div style="margin-top: 20px; margin-bottom: 10px;">
+                        <label for="txtTitle">New Title: </label>
+                        <input class="form-control" id="txtTitle" type="text"/>
+                    </div>
+                    <div class="form-check">
+                    <button id="btnSetTitle" class="btn btn-default">Set Title</button>
+                        <label class="form-check-label">
+                            <input id="chkResetVotes" class="form-check-input" type="checkbox" value="">
+                            Reset Votes
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="form-group panel">
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-default" id="btnShare">Share</button>
+                        <input type="text" id="txtShare" style="visibility:hidden;" />
+                    </div>
                     <button id="btnReset" class="btn btn-default">Reset Votes</button>
-                </div>
+                </fieldset>
+
             </div>
             <div class="form-group col-md-5">
                 <div class="row well">
                     <div>
-                        <label for="lblSessionId">Session #: </label>
+                        <label for="lblSessionId">Session: </label>
                         <span id="lblSessionId" class="form-control-static">nnnnnn</span>
                     </div>
-                    <div style="margin-top: 20px; margin-bottom: 10px;">
-                        <label for="txtTitle">Title: </label>
-                        <input class="form-control" id="txtTitle" type="text"/>
+                    <div style="margin-top: 10px; margin-bottom: 15px;">
+                        <label for="lblTitle">Title: </label>
+                        <div id="lblTitle" class="text-primary">no title yet</div>
                     </div>
-                    <button id="btnSetTitle" class="btn btn-default">Update Title</button>
 
-                    <hr />
                     <div class="table-responsive">
                         <table class="table">
                             <tbody id="votes">
@@ -72,10 +88,6 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div style="margin-bottom: 20px;">
-                    <button class="btn btn-default" id="btnShare">Share</button>
-                    <input type="text" id="txtShare" style="visibility:hidden;" />
-                </div>
 
                 <div class="well">
                     <div class="form-group">

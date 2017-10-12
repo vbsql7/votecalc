@@ -138,8 +138,13 @@ function do_set_title_button(){
     clear_error();
     room = $('#lblSessionId').text();
     var title_text = $('#txtTitle').val();
-    // logit('Send title change');
+    $('#lblTitle').html(title_text);
     socket.emit('update', {room: room, title: title_text});
+    // Reset votes if checkbox is set
+    var reset_wanted = $('#chkResetVotes').is(':checked');
+    if (reset_wanted) {
+        reset_votes();
+    }
 };
 
 
@@ -200,8 +205,8 @@ function show_votes(votes) {
     result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + avg.toString() + '</span></b></td></tr>';
     $('#votes').html(result);
     // Briefly highlight the total
-    $( "#lblAverage" ).effect("shake", {times:2}, 500);
-    $( "#lblAverage" ).effect("highlight", 1000);
+    $( "#lblAverage" ).effect("clip");
+    $( "#lblAverage" ).effect("highlight", 2000);
 
 }
 
@@ -211,12 +216,14 @@ function handleCreateResponse(data) {
 
 function do_reset_button() {
     clear_error();
+    reset_votes();
+}
+
+function reset_votes() {
     var this_room = $('#lblSessionId').text();
-    // logit('Reset ' + this_room);
     data = {room: this_room};
     socket.emit('reset', data);
 }
-
 
 function logit(msg) {
     $('#Log').prepend(msg + '<br/>');
