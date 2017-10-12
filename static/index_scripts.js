@@ -18,8 +18,8 @@ function WireEvents(){
     $('input[type="radio"][name=optSession]').click( do_session_choice );
 
     do_session_choice();
-
     clear_error();
+    show_votes_error(false);
 
     // Connect through web socket to server, supplying session id as namespace
     socket = io.connect(BASE_URL);
@@ -75,24 +75,31 @@ function validate_session() {
 };
 
 function do_vote_button(){
-    var names = $('#txtUser').val().trim();
     var votes = $('#txtVote').val().trim();
-    var error_msg = validate_vote(names, votes);
 
-    if (error_msg == "") {
+    if (validate_vote(votes)) {
 
-        clear_error();
-        $('#txtVote').css('is-invalid', false);
+        show_votes_error(false);
         var this_room = $('#lblSessionId').text();
+        var names = $('#txtUser').val().trim();
         data = {room: this_room, username: names, vote: votes};
         socket.emit('vote', data);
 
     } else {
-        show_error(error_msg);
-        $('#txtVote').css('is-invalid', true);
+        show_votes_error(true);
     }
 
 };
+
+function show_votes_error(has_error) {
+    if (has_error) {
+        $('#ctlVotes').addClass('has-error');
+        $('#lblVoteError').show()
+    } else {
+        $('#ctlVotes').removeClass('has-error');
+        $('#lblVoteError').hide()
+    }
+}
 
 function validate_vote(votes_text) {
     // Multiple votes can be given but must use a space or comma delimiter.
@@ -102,7 +109,7 @@ function validate_vote(votes_text) {
 
     if (votes_text.indexOf(',') >= 0) {
         delim = ",";
-    } else
+    } else {
         delim = " ";
     }
 
@@ -111,13 +118,12 @@ function validate_vote(votes_text) {
     // Check for numeric votes
     for (var i=0; i <= votes.length-1; i++) {
         v = votes[i];
-
         if (!Number.isInteger(parseInt(v))) {
-            return 'All votes must be numeric.';
+            return false;
             break;
         }
     }
-    return "";
+    return true
 };
 
 function do_join_button(){

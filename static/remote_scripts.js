@@ -37,14 +37,50 @@ function WireEvents(){
 };
 
 function do_vote_button(){
-    clear_error();
-    var this_room = $('#lblSessionId').text();
-    var this_username = $('#txtUser').val();
-    var this_vote = $('#txtVote').val();
-    data = {room: this_room, username: this_username, vote: this_vote};
-    socket.emit('vote', data);
+    var names = $('#txtUser').val().trim();
+    var votes = $('#txtVote').val().trim();
+    var error_msg = validate_vote(names, votes);
+
+    if (error_msg == "") {
+
+        clear_error();
+        $('#txtVote').css('is-invalid', false);
+        var this_room = $('#lblSessionId').text();
+        data = {room: this_room, username: names, vote: votes};
+        socket.emit('vote', data);
+
+    } else {
+        show_error(error_msg);
+        $('#txtVote').css('is-invalid', true);
+    }
+
 };
 
+function validate_vote(votes_text) {
+    // Multiple votes can be given but must use a space or comma delimiter.
+    var votes = [];
+    var delim;
+    var v;
+
+    if (votes_text.indexOf(',') >= 0) {
+        delim = ",";
+    } else {
+        delim = " ";
+    }
+
+    votes = votes_text.split(delim);
+
+    // Check for numeric votes
+    for (var i=0; i <= votes.length-1; i++) {
+        v = votes[i];
+
+        if (!Number.isInteger(parseInt(v))) {
+            return 'All votes must be numeric.';
+            break;
+        }
+    }
+    return "";
+};
 
 
 function show_votes(votes) {
@@ -72,18 +108,22 @@ function show_votes(votes) {
 
 
 function OnError(xhr, errorType, exception) {
-    var responseText;
-    $("#error_details").html("");
+    var msg;
     try {
         responseText = $.parseJSON(xhr.responseText);
-        $("#error_details").append("<div><b>" + errorType + " " + exception + "</b></div>");
-        $("#error_details").append("<div><u>Exception</u>:<br /><br />" + responseText.ExceptionType + "</div>");
-        $("#error_details").append("<div><u>StackTrace</u>:<br /><br />" + responseText.StackTrace + "</div>");
-        $("#error_details").append("<div><u>Message</u>:<br /><br />" + responseText.Message + "</div>");
+        msg = "<div><b>" + errorType + " " + exception + "</b></div>";
+        msg += "<div><u>Exception</u>:<br /><br />" + responseText.ExceptionType + "</div>";
+        msg += "<div><u>StackTrace</u>:<br /><br />" + responseText.StackTrace + "</div>";
+        msg += "<div><u>Message</u>:<br /><br />" + responseText.Message + "</div>";
+        show_error(msg);
     } catch (e) {
-        responseText = xhr.responseText;
-        $("#error_details").html(responseText);
+        show_error(xhr.responseText);
     }
+
+}
+
+function show_error(msg) {
+    $("#error_details").html(msg);
     // Make sure error section is visible
     $("#error_details").css('visibility', 'visible');
 }

@@ -7,7 +7,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
         <!-- Bootstrap -->
-        <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
         <!-- Latest compiled and minified JavaScript -->
@@ -50,7 +49,7 @@
                     <button id="btnReset" class="btn btn-default">Reset Votes</button>
                 </div>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-5">
                 <div class="row well">
                     <div>
                         <label for="lblSessionId">Session #: </label>
@@ -72,18 +71,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div style="margin-bottom: 20px;">
                     <button class="btn btn-default" id="btnShare">Share</button>
                     <input type="text" id="txtShare" style="visibility:hidden;" />
                 </div>
 
-                <div class="well form-group">
-                    <label for="txtUser">Name:</label>
-                    <input class="form-control" id="txtUser" placeholder="name" type="text"/>
-                    <div style="margin-top: 10px; margin-bottom: 10px;">
-                        <label for="txtVote">Vote:</label>
-                        <input class="form-control" id="txtVote" placeholder="##" type="text"/>
+                <div class="well">
+                    <div class="form-group">
+                        <label for="txtUser">Names:</label>
+                        <input class="form-control" id="txtUser" placeholder="Name Name Name" type="text"/>
+                    </div>
+                    <div class="form-group" id="ctlVotes" style="margin-top: 10px; margin-bottom: 10px;">
+                        <label for="txtVote">Votes:</label>
+                        <input class="form-control" id="txtVote" placeholder="## ## ##" type="text"/>
+                        <span class="help-block" id="lblVoteError" >Only integers with spaces or commas</span>
                     </div>
                     <button id="btnVote" class="btn btn-default">Cast Vote</button>
                 </div>
