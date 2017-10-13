@@ -36,6 +36,10 @@
                         <div style="margin-top: 5px; margin-left: 20px; margin-bottom: 15px;">
                             <button class="btn btn-default" id="btnCreate">Create</button>
                         </div>
+                        <div style="margin-bottom: 10px;margin-left: 20px;">
+                            <button type="button" class="btn btn-default disabled" id="btnShare">Share</button>
+                            <input type="text" id="txtShare" style="margin-top: 5px; visibility:hidden;" />
+                        </div>
                         <label><input type="radio" name="optSession" value="existing"> Existing</label>
                         <div style="margin-left: 20px;">
                             <div style="margin-top: 5px; margin-bottom: 5px;">
@@ -58,11 +62,7 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset class="form-group panel">
-                    <div style="margin-bottom: 20px;">
-                        <button class="btn btn-default" id="btnShare">Share</button>
-                        <input type="text" id="txtShare" style="visibility:hidden;" />
-                    </div>
+                <fieldset class="form-group">
                     <button id="btnReset" class="btn btn-default">Reset Votes</button>
                 </fieldset>
 

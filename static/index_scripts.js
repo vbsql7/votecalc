@@ -15,6 +15,9 @@ function WireEvents(){
     $('#btnReset').click( do_reset_button );
     $('#txtSession').keyup( validate_session );
 
+    // Disable Share button
+    $('#btnShare').prop('disabled', true)
+
     $('input[type="radio"][name=optSession]').click( do_session_choice );
 
     do_session_choice();
@@ -31,18 +34,14 @@ function WireEvents(){
     socket.on('joined', function(data) {
         $('#lblSessionId').html(data.room);
         $('#txtTitle').val(data.title);
-
-        // Hide session input row
-        $('#rowJoin').css('visibility', 'hidden')
+        $('#btnShare').prop('disabled', false);
+        $('#btnShare').removeClass('disabled');
 
     });
 
     socket.on('change', function(data) {
         // Update different things based on the type of change sent
         switch (data.change_type) {
-            case "title":
-                // $('#txtTitle').val(data.title); --- Host should not receive title changes
-                break;
             case "votes":
                 show_votes(data.votes)
                 break;
@@ -154,7 +153,7 @@ function do_create_button(){
     var url = BASE_URL + "/session/new";
     request_create(url);
     $('#btnCreate').prop('disabled', true)
-    $( "#btnReset" ).prop('disabled', true);
+    $('#btnReset').prop('disabled', true);
 };
 
 function do_share_button(){
