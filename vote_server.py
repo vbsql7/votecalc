@@ -1,6 +1,6 @@
 #!flask/bin/python
 from flask import Flask, jsonify
-from flask import abort, make_response, request, render_template, url_for
+from flask import abort, make_response, request, render_template, url_for, redirect
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
 
@@ -8,8 +8,6 @@ from manager import Manager  # Main session manager/controller
 
 import jsonpickle
 import sys
-
-# TODO: Add Reset button for moderator
 
 async_mode = None
 
@@ -86,20 +84,37 @@ def parse_votes(names, votes):
 
 
 @socketio.on('join')
-def join_session(message):
+def join_event(message):
     rm = message['room']
+    debugmsg('Server asked to join room ' + rm)
     try:
         sess = session_manager.get_session(rm)
         if sess is None:
             abort(404)
         else:
-            join_room(rm)
+            join_room(rm)  # flask function
             debugmsg('Server joined room: ' + rm)
             data = {"room": rm, "title": sess.title, "votes": sess.votes}
             emit('joined', data, room=rm)
     except:
-        debugmsg('Error during join_session: ' + str(sys.exc_info()[0]))
+        debugmsg('Error during join_event: ' + str(sys.exc_info()[0]))
         raise
+
+
+# @socketio.on('joining')
+# def joining_session(message):
+#     rm = message['room']
+#     try:
+#         sess = session_manager.get_session(rm)
+#         if sess is None:
+#             abort(404)
+#         else:
+#             loc = message['location']
+#             debugmsg('Location ' + loc + ' joining room ' + rm)
+#             return render_template('remote.html', session_id=rm, title=sess.title, location=loc)
+#     except:
+#         debugmsg('Error during joining_session: ' + str(sys.exc_info()[0]))
+#         raise
 
 
 @socketio.on('update')
@@ -153,15 +168,33 @@ def get_sessions():
 
 @app.route('/join/<session_id>', methods=['GET'])
 def join_session(session_id):
-    """Join a given session and load the main page."""
+    """Prompt for location to join a session."""
     try:
         sess = session_manager.get_session(session_id)
         if sess is None:
             abort(404)
         else:
-            return render_template('remote.html', session_id=session_id, title=sess.title)
+            return render_template('join.html', session_id=session_id, title=sess.title)
     except:
-        debugmsg('ERROR DURING JOIN get_session: ' + str(sys.exc_info()[0]))
+        debugmsg('ERROR during join_session: ' + str(sys.exc_info()[0]))
+        raise
+
+
+@app.route('/location', methods=['POST'])
+def location_join():
+    """Prompt for location to join a session."""
+    try:
+        debugmsg('Get session_id from form input')
+        session_id = request.form['session_id']
+        sess = session_manager.get_session(session_id)
+        if sess is None:
+            abort(404)
+        else:
+            debugmsg('Get location from form input')
+            loc = request.form['location']
+            return render_template('remote.html', session_id=session_id, location=loc, title=sess.title)
+    except:
+        debugmsg('ERROR during location_join: ' + str(sys.exc_info()[0]))
         raise
 
 

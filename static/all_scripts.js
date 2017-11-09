@@ -1,13 +1,19 @@
 // Custom scripts for application
 
-const BASE_URL = "http://localhost:5000"  // Will be http://votecalc.com
+const APP_NAME = "The App"
+const BASE_URL = "http://localhost:5000"
 
 var socket = "";
 
 $(document).ready( WireEvents );
 
 function WireEvents(){
+
+    // Set application name
+    $('#app-name').html(APP_NAME);
+
     $('#btnJoin').click( do_join_button );
+    // $('#btnJoinRemote').click( do_join_remote );
     $('#btnSetTitle').click( do_set_title_button );
     $('#btnCreate').click( do_create_button );
     $('#btnVote').click( do_vote_button );
@@ -37,17 +43,26 @@ function WireEvents(){
         $('#btnShare').prop('disabled', false);
         $('#btnShare').removeClass('disabled');
 
+        // TODO: Test because this was in remote_scripts.js only
+        show_votes(data.votes);
+
     });
 
     socket.on('change', function(data) {
         // Update different things based on the type of change sent
         switch (data.change_type) {
+            case "title":
+                $('#lblTitle').html(data.title);
+                $( "#lblTitle" ).effect("highlight", 1000);
+                break;
             case "votes":
                 show_votes(data.votes)
                 break;
         }
 
     });
+
+
 };
 
 function do_session_choice() {
@@ -132,6 +147,22 @@ function do_join_button(){
     socket.emit('join', {room: session_id});
 };
 
+function do_join_remote(){
+    var loc = $('#txtLocation').val().trim();
+
+    if (loc.length > 0) {
+
+        show_location_error(false);
+        var room = $('#lblSessionId').text();
+        alert('room = ' + room);
+        request_join(room, loc);
+        // socket.emit('joining', {room: room, location: loc});
+
+    } else {
+        show_location_error(true);
+    }
+
+};
 
 function do_set_title_button(){
     clear_error();
@@ -167,7 +198,31 @@ function do_share_button(){
 
 };
 
+function show_location_error(has_error) {
+    if (has_error) {
+        $('#ctlLocation').addClass('has-error');
+        $('#lblLocationError').show()
+    } else {
+        $('#ctlLocation').removeClass('has-error');
+        $('#lblLocationError').hide()
+    }
+}
 
+function request_join(this_room, this_loc) {
+    $.ajax({
+        url: BASE_URL + '/location/' + this_room + '?location=' + this_loc,
+        type: 'GET',
+        dataType: 'json',
+        crossDomain: true,
+        jsonp: false,
+        success: function (data) { handleJoinResponse(data) },
+        error: OnError
+    });
+}
+
+function handleJoinResponse(data){
+    // Nothing happens here. Server will redirect to Remote.html.
+}
 
 function request_create(server_url) {
     // logit('url: ' + server_url);

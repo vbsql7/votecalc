@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+    <head>
+        <!-- jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+        <!-- Socket io library for use with Flask-SocketIO -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
+        <!-- Custom jQuery and javascript for this app -->
+        <script src="{{ url_for('static', filename='all_scripts.js')}}"></script>
+
+        <!-- Custom style sheet for this app -->
+        <link rel="{{ url_for('static', filename='vc_styles.css')}}">
+    </head>
+
+    <body>
+
+        <div class="container">
+
+            <div class="row">
+                <center><h2 id="app-name">x</h2></center>
+            </div>
+
+            <div id="reused_content">
+                {% block reused_content %}{% endblock %}
+            </div>
+
+            <hr />
+
+            <div class="row" id="Log">
+            </div>
+
+            <div class="alert alert-warning" id="error_details">
+                <h3>ERROR</h3>
+            </div>
+        </div>
+
+    </body>
+
+</html>
