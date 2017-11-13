@@ -4,6 +4,7 @@ const APP_NAME = "The App"
 const BASE_URL = "http://localhost:5000"
 
 var socket = "";
+var this_location = "host"; // Remote client will override this
 
 $(document).ready( WireEvents );
 
@@ -96,7 +97,7 @@ function do_vote_button(){
         show_votes_error(false);
         var this_room = $('#lblSessionId').text();
         var names = $('#txtUser').val().trim();
-        data = {room: this_room, username: names, vote: votes};
+        data = {room: this_room, username: names, vote: votes, location: this_location};
         socket.emit('vote', data);
 
     } else {

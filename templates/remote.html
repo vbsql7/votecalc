@@ -6,8 +6,12 @@ $(document).ready( JoinRoom );
 
 function JoinRoom(){
     var this_room = $('#lblSessionId').text();
-    logit('Remote asking to join room ' + this_room);
+
+    // Tell server to link this client to the room
     socket.emit('join', {room: this_room});
+
+    // Set location variable based on parameter
+    this_location = $('#lblLocation').text();
 }
 
 </script>
@@ -20,7 +24,7 @@ function JoinRoom(){
             </div>
             <div>
                 <span class="field-label">Location: </span>
-                <span>{{ location }}</span>
+                <span id="lblLocation">{{ location }}</span>
             </div>
             <div style="margin-top: 10px; margin-bottom: 15px;">
                 <h4>Title: </h4>

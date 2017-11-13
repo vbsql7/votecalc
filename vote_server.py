@@ -50,9 +50,10 @@ def process_vote(data):
         else:
             names = data['username']
             votes = data['vote']
+            location = data['location']
             dvotes = parse_votes(names, votes)
             for name, vote in dvotes:
-                sess.add_vote(name, vote)
+                sess.add_vote(name, vote, location)
             # Send all votes to all clients in the room
             emit('change', {"change_type": 'votes', "votes": sess.votes}, room=rm)
     except:
@@ -99,22 +100,6 @@ def join_event(message):
     except:
         debugmsg('Error during join_event: ' + str(sys.exc_info()[0]))
         raise
-
-
-# @socketio.on('joining')
-# def joining_session(message):
-#     rm = message['room']
-#     try:
-#         sess = session_manager.get_session(rm)
-#         if sess is None:
-#             abort(404)
-#         else:
-#             loc = message['location']
-#             debugmsg('Location ' + loc + ' joining room ' + rm)
-#             return render_template('remote.html', session_id=rm, title=sess.title, location=loc)
-#     except:
-#         debugmsg('Error during joining_session: ' + str(sys.exc_info()[0]))
-#         raise
 
 
 @socketio.on('update')
@@ -168,7 +153,7 @@ def get_sessions():
 
 @app.route('/join/<session_id>', methods=['GET'])
 def join_session(session_id):
-    """Prompt for location to join a session."""
+    """Prompt remote users for a location to identify them as they join a session."""
     try:
         sess = session_manager.get_session(session_id)
         if sess is None:
@@ -182,7 +167,7 @@ def join_session(session_id):
 
 @app.route('/location', methods=['POST'])
 def location_join():
-    """Prompt for location to join a session."""
+    """Join a session (room) from a given location."""
     try:
         debugmsg('Get session_id from form input')
         session_id = request.form['session_id']
