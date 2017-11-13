@@ -99,6 +99,8 @@ function do_vote_button(){
         var names = $('#txtUser').val().trim();
         data = {room: this_room, username: names, vote: votes, location: this_location};
         socket.emit('vote', data);
+        // Clear local votes (but not names)
+        $('#txtVote').val('')
 
     } else {
         show_votes_error(true);
