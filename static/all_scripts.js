@@ -22,6 +22,7 @@ function WireEvents(){
     $('#btnShare').click( do_share_button );
     $('#btnReset').click( do_reset_button );
     $('#txtSession').keyup( validate_session );
+    $('button[name=btnNumber]').click( do_number_button );
 
     // Disable Share button
     $('#btnShare').prop('disabled', true)
@@ -67,6 +68,16 @@ function WireEvents(){
 
 
 };
+
+function do_number_button() {
+    var v = $(this).val();
+    add_local_vote(v)
+}
+
+function add_local_vote(v) {
+    x = $('#txtVote').val();
+    $('#txtVote').val(x + ' ' + v).trim;
+}
 
 function do_session_choice() {
     var choice = $('input[name=optSession]:checked').val();
