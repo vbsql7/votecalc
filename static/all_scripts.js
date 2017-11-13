@@ -1,10 +1,11 @@
 // Custom scripts for application
 
-const APP_NAME = "The App"
+const APP_NAME = "Vote"
 const BASE_URL = "http://localhost:5000"
 
 var socket = "";
 var this_location = "host"; // Remote client will override this
+var location_has_voted = false; // Reset every time the title changes; Used to mask votes of others.
 
 $(document).ready( WireEvents );
 
@@ -45,7 +46,7 @@ function WireEvents(){
         $('#btnShare').removeClass('disabled');
 
         // TODO: Test because this was in remote_scripts.js only
-        show_votes(data.votes);
+        show_votes(data.votes, true);
 
     });
 
@@ -55,9 +56,10 @@ function WireEvents(){
             case "title":
                 $('#lblTitle').html(data.title);
                 $( "#lblTitle" ).effect("highlight", 1000);
+                location_has_voted = false; // new story requires a new vote
                 break;
             case "votes":
-                show_votes(data.votes)
+                show_votes(data.votes);
                 break;
         }
 
@@ -97,6 +99,7 @@ function do_vote_button(){
         show_votes_error(false);
         var this_room = $('#lblSessionId').text();
         var names = $('#txtUser').val().trim();
+        location_has_voted = true;
         data = {room: this_room, username: names, vote: votes, location: this_location};
         socket.emit('vote', data);
         // Clear local votes (but not names)
@@ -245,13 +248,24 @@ function show_votes(votes) {
     result = "<tr><th>User</th><th>Vote</th></tr>";
     total = 0;
     vote_count = 0;
-    $.map(votes, function(vote, user){
-        result +='<tr><td>' + user + '</td><td>' + vote + '</td></tr>';
+    for (var key in votes) {
+        user = key.split('|')[0];
+        loc = key.split('|')[1];
+        vote = votes[key];
+
+        if (location_has_voted) {
+            displayed_vote = vote;
+        } else {
+            displayed_vote = '**';
+        }
+
+        result +='<tr><td>' + user + ' (' + loc + ')</td><td>' + displayed_vote + '</td></tr>';
+
         if ($.isNumeric(vote)){
             total += parseInt(vote);
             vote_count += 1;
         }
-    });
+    };
     if(vote_count > 0) {
         avg = (total/vote_count).toFixed(2);
         // Enable reset button
@@ -259,7 +273,14 @@ function show_votes(votes) {
     } else {
         avg = total;
     }
-    result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + avg.toString() + '</span></b></td></tr>';
+
+    if (location_has_voted) {
+        displayed_avg = avg.toString();
+    } else {
+        displayed_avg = "****";
+    }
+
+    result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + displayed_avg + '</span></b></td></tr>';
     $('#votes').html(result);
     // Briefly highlight the total
     $( "#lblAverage" ).effect("clip");

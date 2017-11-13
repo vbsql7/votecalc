@@ -51,16 +51,20 @@ def process_vote(data):
             names = data['username']
             votes = data['vote']
             location = data['location']
+            debugmsg('Votes received for location ' + location)
             dvotes = parse_votes(names, votes)
             for name, vote in dvotes:
                 sess.add_vote(name, vote, location)
+            debugmsg('Notify all locations of new votes (emit)')
             # Send all votes to all clients in the room
             emit('change', {"change_type": 'votes', "votes": sess.votes}, room=rm)
     except:
         debugmsg('Error during process_vote: ' + str(sys.exc_info()[0]))
         raise
 
+
 def parse_votes(names, votes):
+    """Parse strings of names and votes into matching arrays. Allow names to be missing."""
     dvotes = []
     if votes.find(',') >= 0:
         delim = ','
