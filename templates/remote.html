@@ -1,6 +1,16 @@
 {% extends "layout.html" %}
 {% block reused_content %}
 
+<script>
+$(document).ready( JoinRoom );
+
+function JoinRoom(){
+    var this_room = $('#lblSessionId').text();
+    logit('Remote asking to join room ' + this_room);
+    socket.emit('join', {room: this_room});
+}
+
+</script>
 <div class="row">
     <div class="form-group col-md-7">
         <div class="row well">

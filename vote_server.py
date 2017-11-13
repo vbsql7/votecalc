@@ -192,6 +192,7 @@ def location_join():
         else:
             debugmsg('Get location from form input')
             loc = request.form['location']
+            debugmsg('Render remote template for room ' + session_id + ', location ' + loc)
             return render_template('remote.html', session_id=session_id, location=loc, title=sess.title)
     except:
         debugmsg('ERROR during location_join: ' + str(sys.exc_info()[0]))
