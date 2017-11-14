@@ -9,13 +9,13 @@
             <div class="form-group">
                 <label><input type="radio" name="optSession" value = "new" checked="checked"> New</label>
                 <div style="margin-top: 5px; margin-left: 20px; margin-bottom: 15px;">
-                    <button class="btn btn-default" id="btnCreate">Create</button>
+                    <button class="btn btn-primary" id="btnCreate">Create</button>
                 </div>
                 <div style="margin-bottom: 10px;margin-left: 20px;">
                     <button type="button" class="btn btn-default disabled" id="btnShare">Share</button>
                     <input type="text" id="txtShare" style="margin-top: 5px; visibility:hidden;" />
                 </div>
-                <label><input type="radio" name="optSession" value="existing"> Existing</label>
+                <label><input type="radio" name="optSession" value="existing"> Rejoin</label>
                 <div style="margin-left: 20px;">
                     <div style="margin-top: 5px; margin-bottom: 5px;">
                         <input class="form-control" style="width: 100px" id="txtSession" placeholder="aann" type="text"/>
@@ -72,7 +72,7 @@
             <div class="form-group" id="ctlVotes" style="margin-top: 10px; margin-bottom: 10px;">
                 <label for="txtVote">Votes:</label>
                 <input class="form-control" id="txtVote" placeholder="## ## ##" type="text"/>
-                <span class="help-block" id="lblVoteError" >Only integers with spaces or commas</span>
+                <span class="help-block" id="lblVoteError" >error message placeholder</span>
             </div>
             <div style="margin-bottom: 10px;">
                 <button name="btnNumber" class="btn btn-outline-primary btn-sm" value="1">1</button>

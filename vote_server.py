@@ -40,6 +40,14 @@ def connect_client():
     return True
 
 
+@socketio.on('send-message')
+def receive_message(data):
+    rm = data['room']
+    msg = data['message']
+    emit('change', {"change_type": 'message', "message": msg}, room=rm)
+    return True
+
+
 @socketio.on('vote')
 def process_vote(data):
     rm = data['room']
@@ -87,11 +95,11 @@ def parse_votes(names, votes):
     return dvotes
 
 
-
 @socketio.on('join')
 def join_event(message):
     rm = message['room']
-    debugmsg('Server asked to join room ' + rm)
+    loc = message['location']
+    debugmsg('Location ' + loc + ' joining room ' + rm)
     try:
         sess = session_manager.get_session(rm)
         if sess is None:
@@ -99,7 +107,7 @@ def join_event(message):
         else:
             join_room(rm)  # flask function
             debugmsg('Server joined room: ' + rm)
-            data = {"room": rm, "title": sess.title, "votes": sess.votes}
+            data = {"room": rm, "title": sess.title, "votes": sess.votes, "location": loc}
             emit('joined', data, room=rm)
     except:
         debugmsg('Error during join_event: ' + str(sys.exc_info()[0]))

@@ -4,7 +4,7 @@ const APP_NAME = "Vote"
 const BASE_URL = "http://localhost:5000"
 
 var socket = "";
-var this_location = "host"; // Remote client will override this
+var this_location = "host";     // Remote client will override this
 var location_has_voted = false; // Reset every time the title changes; Used to mask votes of others.
 
 $(document).ready( WireEvents );
@@ -31,14 +31,10 @@ function WireEvents(){
 
     do_session_choice();
     clear_error();
-    show_votes_error(false);
+    show_votes_error('');
 
     // Connect through web socket to server, supplying session id as namespace
     socket = io.connect(BASE_URL);
-
-    socket.on('server_connect', function (msg) {
-        // logit('Server connected');
-    });
 
     socket.on('joined', function(data) {
         $('#lblSessionId').html(data.room);
@@ -46,7 +42,11 @@ function WireEvents(){
         $('#btnShare').prop('disabled', false);
         $('#btnShare').removeClass('disabled');
 
-        // TODO: Test because this was in remote_scripts.js only
+        var loc = data.location;
+        if (loc.length > 0) {
+            logit('Location ' + loc + ' has joined.')
+        }
+
         show_votes(data.votes, true);
 
     });
@@ -61,6 +61,9 @@ function WireEvents(){
                 break;
             case "votes":
                 show_votes(data.votes);
+                break;
+            case "message":
+                logit(data.message);
                 break;
         }
 
@@ -107,41 +110,48 @@ function do_vote_button(){
 
     if (validate_vote(votes)) {
 
-        show_votes_error(false);
-        var this_room = $('#lblSessionId').text();
-        var names = $('#txtUser').val().trim();
-        location_has_voted = true;
-        data = {room: this_room, username: names, vote: votes, location: this_location};
-        socket.emit('vote', data);
-        // Clear local votes (but not names)
-        $('#txtVote').val('')
+        var users = $('#txtUser').val().trim();
+
+        if (validate_vote_count(users, votes)) {
+
+            show_votes_error('');
+            var this_room = $('#lblSessionId').text();
+            var names = $('#txtUser').val().trim();
+            location_has_voted = true;
+            data = {room: this_room, username: names, vote: votes, location: this_location};
+            socket.emit('vote', data);
+            // Clear local votes (but not names)
+            $('#txtVote').val('')
+
+        } else {
+            show_votes_error('Vote count differs from Name count');
+        }
 
     } else {
-        show_votes_error(true);
+        show_votes_error('Only integers with spaces or commas');
     }
 
 };
 
-function show_votes_error(has_error) {
-    if (has_error) {
+function show_votes_error(error_msg) {
+    if (error_msg != "") {
         $('#ctlVotes').addClass('has-error');
-        $('#lblVoteError').show()
+        $('#lblVoteError').text(error_msg);
+        $('#lblVoteError').show();
     } else {
         $('#ctlVotes').removeClass('has-error');
-        $('#lblVoteError').hide()
+        $('#lblVoteError').hide();
     }
 }
 
 function validate_vote(votes_text) {
     // Multiple votes can be given but must use a space or comma delimiter.
     var votes = [];
-    var delim;
+    var delim = " ";
     var v;
 
     if (votes_text.indexOf(',') >= 0) {
         delim = ",";
-    } else {
-        delim = " ";
     }
 
     votes = votes_text.split(delim);
@@ -157,11 +167,30 @@ function validate_vote(votes_text) {
     return true
 };
 
+function validate_vote_count(users, votes) {
+    // Ensure there are enough users to cover the votes cast
+    var delim = " "
+    if (votes.indexOf(',') >= 0) {
+        delim = ",";
+    }
+    var user_count = users.split(delim).length;
+    var vote_count = votes.split(delim).length;
+
+    // If more than one name or vote is present, we assume that user has multiple people at that location and
+    // therefore we take the trouble to help them get voting right by matching votes with names.
+    // If only one value is given, we can identify the vote with the location and don't really need the name.
+    if ((vote_count != user_count) && ((vote_count > 1) || (user_count > 1))){
+        return false
+    } else {
+        return true // OK
+    }
+
+}
+
 function do_join_button(){
     clear_error();
     var session_id = $('#txtSession').val();
-    // logit('join room ' + session_id);
-    socket.emit('join', {room: session_id});
+    socket.emit('join', {room: session_id, location: this_location});
 };
 
 function do_join_remote(){
@@ -173,7 +202,6 @@ function do_join_remote(){
         var room = $('#lblSessionId').text();
         alert('room = ' + room);
         request_join(room, loc);
-        // socket.emit('joining', {room: room, location: loc});
 
     } else {
         show_location_error(true);
@@ -184,12 +212,20 @@ function do_join_remote(){
 function do_set_title_button(){
     clear_error();
     room = $('#lblSessionId').text();
+    var previous_title = $('#lblTitle').text();
     var title_text = $('#txtTitle').val();
     $('#lblTitle').html(title_text);
     socket.emit('update', {room: room, title: title_text});
-    // Reset votes if checkbox is set
-    var reset_wanted = $('#chkResetVotes').is(':checked');
-    if (reset_wanted) {
+
+    // If Reset desired, reset votes and show previous story
+    if ($('#chkResetVotes').is(':checked')) {
+        // Send completed story message to room
+        // if (previous_title != 'no title yet'){
+        if (location_has_voted){
+            var data = {room: room, message: 'Completed: ' + previous_title + ' (' +  $('#lblAverage').text() + ')'};
+            socket.emit('send-message', data);
+        }
+        // Reset all votes
         reset_votes();
     }
 };
@@ -300,7 +336,7 @@ function show_votes(votes) {
 }
 
 function handleCreateResponse(data) {
-    socket.emit('join', {room: data.id});
+    socket.emit('join', {room: data.id, location: 'host'});
 }
 
 function do_reset_button() {

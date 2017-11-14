@@ -7,11 +7,12 @@ $(document).ready( JoinRoom );
 function JoinRoom(){
     var this_room = $('#lblSessionId').text();
 
-    // Tell server to link this client to the room
-    socket.emit('join', {room: this_room});
-
     // Set location variable based on parameter
     this_location = $('#lblLocation').text();
+
+    // Tell server to link this client to the room
+    socket.emit('join', {room: this_room, location: this_location});
+
 }
 
 </script>
