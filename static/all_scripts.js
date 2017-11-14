@@ -292,27 +292,40 @@ function request_create(server_url) {
 
 
 function show_votes(votes) {
-    result = "<tr><th>User</th><th>Vote</th></tr>";
-    total = 0;
-    vote_count = 0;
-    for (var key in votes) {
-        user = key.split('|')[0];
-        loc = key.split('|')[1];
-        vote = votes[key];
+    var result = "<tr><th>User</th><th>Vote</th></tr>";
+    var total = 0;
+    var vote_count = 0;
+    var avg = 0;
+    var displayed_avg;
 
+    var extreme_votes = find_extreme_votes(votes);
+
+    for (var key in votes) {
+        // key is in the form user|location
+        var user = key.split('|')[0];
+        var loc = key.split('|')[1];
+        var vote = votes[key];
+        var extreme_class = '';
+        var marker = '';
         if (location_has_voted) {
             displayed_vote = vote;
+
+            if (extreme_votes.indexOf(Number(vote)) >= 0){
+                extreme_class = ' bgcolor="yellow" ';
+                marker = ' !'
+            }
         } else {
             displayed_vote = '**';
         }
 
-        result +='<tr><td>' + user + ' (' + loc + ')</td><td>' + displayed_vote + '</td></tr>';
+        result +='<tr><td>' + user + ' (' + loc + ')</td><td' + extreme_class + '>' + displayed_vote + marker + '</td></tr>';
 
         if ($.isNumeric(vote)){
             total += parseInt(vote);
             vote_count += 1;
         }
     };
+
     if(vote_count > 0) {
         avg = (total/vote_count).toFixed(2);
         // Enable reset button
@@ -329,6 +342,9 @@ function show_votes(votes) {
 
     result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + displayed_avg + '</span></b></td></tr>';
     $('#votes').html(result);
+
+    // $('#votes').redraw();
+
     // Briefly highlight the total
     $( "#lblAverage" ).effect("clip");
     $( "#lblAverage" ).effect("highlight", 2000);
@@ -337,6 +353,43 @@ function show_votes(votes) {
 
 function handleCreateResponse(data) {
     socket.emit('join', {room: data.id, location: 'host'});
+}
+
+function find_extreme_votes(votes) {
+    // Find extreme votes, defined as votes more than two gaps apart in the number sequence.
+    var numbers = [1, 2, 3, 5, 9, 13, 21, 34, 55, 89]
+    var min_num = 777
+    var max_num = 0
+
+    // Find the min and max in the list
+    for (var key in votes) {
+        var vote = Number(votes[key]);
+        if (vote < min_num) {
+            min_num = vote;
+        }
+        if (vote > max_num) {
+            max_num = vote;
+        }
+    }
+
+    // First, find the position of min and max votes
+    var min_pos = 99;
+    var max_pos = -1;
+    for(i=0; i < numbers.length; i++){
+        if (numbers[i] == min_num) {
+            min_pos = i;
+        }
+        if (numbers[i] == max_num) {
+            max_pos = i;
+        }
+    }
+
+    // Second, measure the distance between the positions
+    if ((max_pos - min_pos) > 2){
+        return [min_num, max_num];
+    } else {
+        return []; // There are no extreme votes
+    }
 }
 
 function do_reset_button() {
