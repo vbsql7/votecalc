@@ -2,6 +2,9 @@
 
 const APP_NAME = "Vote"
 const BASE_URL = "http://localhost:5000"
+const EXTREME_ALERT_COLOR = "LightPink"
+
+var VOTING_NUMBERS = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 
 var socket = "";
 var this_location = "host";     // Remote client will override this
@@ -73,13 +76,10 @@ function WireEvents(){
 };
 
 function do_number_button() {
-    var v = $(this).val();
-    add_local_vote(v)
-}
-
-function add_local_vote(v) {
-    x = $('#txtVote').val();
-    $('#txtVote').val(x + ' ' + v).trim;
+    // Add vote from number button
+    var new_vote = $(this).val();
+    var current_votes = $('#txtVote').val();
+    $('#txtVote').val(current_votes + ' ' + new_vote).trim;
 }
 
 function do_session_choice() {
@@ -128,7 +128,7 @@ function do_vote_button(){
         }
 
     } else {
-        show_votes_error('Only integers with spaces or commas');
+        show_votes_error('Invalid vote(s) found');
     }
 
 };
@@ -159,7 +159,8 @@ function validate_vote(votes_text) {
     // Check for numeric votes
     for (var i=0; i <= votes.length-1; i++) {
         v = votes[i];
-        if (!Number.isInteger(parseInt(v))) {
+//        if (!Number.isInteger(parseInt(v)) || (parseInt(v) not in VOTING_NUMBERS)) {
+        if (!VOTING_NUMBERS.includes(parseInt(v))) {
             return false;
             break;
         }
@@ -292,7 +293,7 @@ function request_create(server_url) {
 
 
 function show_votes(votes) {
-    var result = "<tr><th>User</th><th>Vote</th></tr>";
+    var result = '<tr><th>User</th><th>Vote</th></tr>';
     var total = 0;
     var vote_count = 0;
     var avg = 0;
@@ -305,20 +306,18 @@ function show_votes(votes) {
         var user = key.split('|')[0];
         var loc = key.split('|')[1];
         var vote = votes[key];
-        var extreme_class = '';
-        var marker = '';
+        var extreme_name = '';
         if (location_has_voted) {
             displayed_vote = vote;
 
             if (extreme_votes.indexOf(Number(vote)) >= 0){
-                extreme_class = ' bgcolor="yellow" ';
-                marker = ' !'
+                extreme_name = '  name="extreme-alert"';
             }
         } else {
             displayed_vote = '**';
         }
 
-        result +='<tr><td>' + user + ' (' + loc + ')</td><td' + extreme_class + '>' + displayed_vote + marker + '</td></tr>';
+        result +='<tr><td  class="col-sm-3">' + user + ' (' + loc + ')</td><td class="col-sm-1"' + extreme_name + '>' + displayed_vote + '</td><td class="col-sm-1"></td></tr>';
 
         if ($.isNumeric(vote)){
             total += parseInt(vote);
@@ -343,11 +342,19 @@ function show_votes(votes) {
     result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + displayed_avg + '</span></b></td></tr>';
     $('#votes').html(result);
 
-    // $('#votes').redraw();
-
     // Briefly highlight the total
     $( "#lblAverage" ).effect("clip");
     $( "#lblAverage" ).effect("highlight", 2000);
+
+    if (extreme_votes.length > 0) {
+        logit('More than 2 number gaps present in votes');
+        // Add extreme class (highlighter) to all cells marked extreme-alert
+        // (tried using .addClass to do this but it would not paint the color after the TD got that class)
+        var cells = $('td[name=extreme-alert]');
+        for (var i=0, len=cells.length; i<len; i++){
+            cells[i].style.backgroundColor = EXTREME_ALERT_COLOR;
+        }
+    }
 
 }
 
@@ -357,7 +364,6 @@ function handleCreateResponse(data) {
 
 function find_extreme_votes(votes) {
     // Find extreme votes, defined as votes more than two gaps apart in the number sequence.
-    var numbers = [1, 2, 3, 5, 9, 13, 21, 34, 55, 89]
     var min_num = 777
     var max_num = 0
 
@@ -375,14 +381,16 @@ function find_extreme_votes(votes) {
     // First, find the position of min and max votes
     var min_pos = 99;
     var max_pos = -1;
-    for(i=0; i < numbers.length; i++){
-        if (numbers[i] == min_num) {
+    for(i=0; i < VOTING_NUMBERS.length; i++){
+        if (VOTING_NUMBERS[i] == min_num) {
             min_pos = i;
         }
-        if (numbers[i] == max_num) {
+        if (VOTING_NUMBERS[i] == max_num) {
             max_pos = i;
         }
     }
+
+// DEBUG logit(max_pos.toString() + ' - ' + min_pos.toString() + ' = ' + (max_pos-min_pos).toString());
 
     // Second, measure the distance between the positions
     if ((max_pos - min_pos) > 2){
