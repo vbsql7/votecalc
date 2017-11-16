@@ -45,9 +45,11 @@ function WireEvents(){
         $('#btnShare').prop('disabled', false);
         $('#btnShare').removeClass('disabled');
 
+        reveal_sections();
+
         var loc = data.location;
         if (loc.length > 0) {
-            logit('Location ' + loc + ' has joined.')
+            logit('Location "' + loc + '" has joined.')
         }
 
         show_votes(data.votes, true);
@@ -252,6 +254,13 @@ function do_share_button(){
 
 };
 
+function reveal_sections() {
+    // Show hidden sections
+    $('#main-section').show();
+    $('#main-section').show();
+    $('#votes-section').show();
+    $('#update-section').show();
+}
 function show_location_error(has_error) {
     if (has_error) {
         $('#ctlLocation').addClass('has-error');
