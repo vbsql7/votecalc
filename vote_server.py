@@ -60,6 +60,9 @@ def process_vote(data):
             votes = data['vote']
             location = data['location']
             debugmsg('Votes received for location ' + location)
+            # Clear existing votes for this location
+            sess.clear_location(location)
+            # Get a matching set of names and votes
             dvotes = parse_votes(names, votes)
             for name, vote in dvotes:
                 sess.add_vote(name, vote, location)

@@ -12,4 +12,12 @@ class Session:
         self.votes[this_username + '|' + location] = this_vote
 
     def reset(self):
+        """Delete all votes (story change, typically)"""
         self.votes = {}
+
+    def clear_location(self, location):
+        """Remove all votes for a given location."""
+        for key, value in self.votes.copy().items():
+            item_loc = key.split('|')[1]
+            if item_loc == location:
+                del self.votes[key]
