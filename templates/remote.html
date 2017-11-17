@@ -22,14 +22,12 @@ function JoinRoom(){
             <div>
                 <span class="field-label">Session: </span>
                 <span id="lblSessionId">{{ session_id }}</span>
-            </div>
-            <div>
                 <span class="field-label">Location: </span>
                 <span id="lblLocation">{{ location }}</span>
             </div>
             <div style="margin-top: 10px; margin-bottom: 15px;">
                 <h4>Title: </h4>
-                <div id="lblTitle" class="text-primary">{{ title }}</div>
+                <div id="lblTitle" class="text-primary lead">{{ title }}</div>
             </div>
             <div class="table-responsive">
                 <table class="table" id="votes-table">
@@ -45,11 +43,11 @@ function JoinRoom(){
         <div class="well">
             <div class="form-group">
                 <label for="txtUser">Names:</label>
-                <input class="form-control" id="txtUser" placeholder="Name Name Name" type="text"/>
+                <input class="form-control" id="txtUser" placeholder="Name Name Name" type="text" data-toggle="tooltip" title="Voter names separated by spaces"/>
             </div>
             <div class="form-group" id="ctlVotes" style="margin-top: 10px; margin-bottom: 10px;">
                 <label for="txtVote">Votes:</label>
-                <input class="form-control" id="txtVote" placeholder="## ## ##" type="text"/>
+                <input class="form-control" id="txtVote" placeholder="## ## ##" type="text"  data-toggle="tooltip" title="Votes separated by spaces"/>
                 <span class="help-block" id="lblVoteError" >Only integers with spaces or commas</span>
             </div>
             <div style="margin-bottom: 10px;">

@@ -4,9 +4,9 @@ const APP_NAME = "Vote"
 const BASE_URL = "http://localhost:5000"
 const EXTREME_ALERT_COLOR = "LightPink"
 
+// Globals
 var VOTING_NUMBERS = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
-
-var socket = "";
+var socket = "";                // Used by SocketIO to transmit messages
 var this_location = "host";     // Remote client will override this
 var location_has_voted = false; // Reset every time the title changes; Used to mask votes of others.
 
@@ -16,7 +16,6 @@ function WireEvents(){
 
     // Set application name
     $('#app-name').html(APP_NAME);
-
     $('#btnJoin').click( do_join_button );
     // $('#btnJoinRemote').click( do_join_remote );
     $('#btnSetTitle').click( do_set_title_button );
@@ -26,18 +25,14 @@ function WireEvents(){
     $('#btnReset').click( do_reset_button );
     $('#txtSession').keyup( validate_session );
     $('button[name=btnNumber]').click( do_number_button );
-
-    // Disable Share button
     $('#btnShare').prop('disabled', true)
-
     $('input[type="radio"][name=optSession]').click( do_session_choice );
 
     do_session_choice();
     clear_error();
     show_votes_error('');
 
-    // Connect through web socket to server, supplying session id as namespace
-    socket = io.connect(BASE_URL);
+    connect_to_server();
 
     socket.on('joined', function(data) {
         $('#lblSessionId').html(data.room);
@@ -77,6 +72,14 @@ function WireEvents(){
 
 };
 
+function connect_to_server() {
+    // Connect through web socket to server, supplying session id as namespace
+    try {
+        socket = io.connect(BASE_URL);
+    } catch (err) {
+        show_error('Cannot connect to server: ' + err);
+    }
+}
 function do_number_button() {
     // Add vote from number button
     var new_vote = $(this).val();
@@ -85,6 +88,7 @@ function do_number_button() {
 }
 
 function do_session_choice() {
+    // Set up controls based on create/join session choice
     var choice = $('input[name=optSession]:checked').val();
     if (choice == 'new') {
         $('#btnCreate').prop('disabled', false);
@@ -97,6 +101,7 @@ function do_session_choice() {
 }
 
 function validate_session() {
+    // Validate format of session id input
     var x = $('#txtSession').val();
     $('#txtSession').val(x.toUpperCase());
     // Enable Join if session entry looks ok
@@ -108,6 +113,7 @@ function validate_session() {
 };
 
 function do_vote_button(){
+    // Cast all votes
     var votes = $('#txtVote').val().trim();
 
     if (validate_vote(votes)) {
@@ -121,7 +127,13 @@ function do_vote_button(){
             var names = $('#txtUser').val().trim();
             location_has_voted = true;
             data = {room: this_room, username: names, vote: votes, location: this_location};
-            socket.emit('vote', data);
+
+            try {
+                socket.emit('vote', data);
+            } catch (err) {
+                show_error('Failed to send votes to server: ' + err);
+            }
+
             // Clear local votes (but not names)
             $('#txtVote').val('')
 
@@ -161,7 +173,6 @@ function validate_vote(votes_text) {
     // Check for numeric votes
     for (var i=0; i <= votes.length-1; i++) {
         v = votes[i];
-//        if (!Number.isInteger(parseInt(v)) || (parseInt(v) not in VOTING_NUMBERS)) {
         if (!VOTING_NUMBERS.includes(parseInt(v))) {
             return false;
             break;
@@ -191,12 +202,18 @@ function validate_vote_count(users, votes) {
 }
 
 function do_join_button(){
+    // Tell server host wants to join a given room
     clear_error();
     var session_id = $('#txtSession').val();
-    socket.emit('join', {room: session_id, location: this_location});
+    try {
+        socket.emit('join', {room: session_id, location: this_location});
+    } catch (err) {
+        show_error('Cannot send join request to server: ' + err);
+    }
 };
 
 function do_join_remote(){
+    // Tell server remote location wants to join a given room
     var loc = $('#txtLocation').val().trim();
 
     if (loc.length > 0) {
@@ -213,6 +230,7 @@ function do_join_remote(){
 };
 
 function do_set_title_button(){
+    // Update title of current story and optionally reset votes
     clear_error();
     room = $('#lblSessionId').text();
     var previous_title = $('#lblTitle').text();
@@ -220,13 +238,17 @@ function do_set_title_button(){
     $('#lblTitle').html(title_text);
     socket.emit('update', {room: room, title: title_text});
 
-    // If Reset desired, reset votes and show previous story
+    // If Reset desired, reset votes and add previous story to history display
     if ($('#chkResetVotes').is(':checked')) {
         // Send completed story message to room
         // if (previous_title != 'no title yet'){
         if (location_has_voted){
             var data = {room: room, message: 'Completed: ' + previous_title + ' (' +  $('#lblAverage').text() + ')'};
-            socket.emit('send-message', data);
+            try {
+                socket.emit('send-message', data);
+            } catch (err) {
+                show_error('Cannot send completed vote message to server: ' + err);
+            }
         }
         // Reset all votes
         reset_votes();
@@ -262,6 +284,7 @@ function reveal_sections() {
     $('#update-section').css('visibility', 'visible');
 }
 function show_location_error(has_error) {
+    // Show location entry validation error
     if (has_error) {
         $('#ctlLocation').addClass('has-error');
         $('#lblLocationError').show()
@@ -272,19 +295,21 @@ function show_location_error(has_error) {
 }
 
 function request_join(this_room, this_loc) {
-    $.ajax({
-        url: BASE_URL + '/location/' + this_room + '?location=' + this_loc,
-        type: 'GET',
-        dataType: 'json',
-        crossDomain: true,
-        jsonp: false,
-        success: function (data) { handleJoinResponse(data) },
-        error: OnError
-    });
-}
+    // Post request to server for location to join a room
+    try {
+        $.ajax({
+            url: BASE_URL + '/location/' + this_room + '?location=' + this_loc,
+            type: 'GET',
+            dataType: 'json',
+            crossDomain: true,
+            jsonp: false,
+            success: function (data) {  },
+            error: OnError
+        });
+    } catch (err) {
+        show_error('Cannot post location join request: ' + err);
+    }
 
-function handleJoinResponse(data){
-    // Nothing happens here. Server will redirect to Remote.html.
 }
 
 function request_create(server_url) {
