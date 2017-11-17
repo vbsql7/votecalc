@@ -304,7 +304,7 @@ function request_join(this_room, this_loc) {
             crossDomain: true,
             jsonp: false,
             success: function (data) {  },
-            error: OnError
+            error: AjaxError
         });
     } catch (err) {
         show_error('Cannot post location join request: ' + err);
@@ -313,20 +313,25 @@ function request_join(this_room, this_loc) {
 }
 
 function request_create(server_url) {
-    // logit('url: ' + server_url);
-    $.ajax({
-        url: server_url,
-        type: 'POST',
-        dataType: 'json',
-        crossDomain: true,
-        jsonp: false,
-        success: function (data) { handleCreateResponse(data) },
-        error: OnError
-    });
+    // Ask server to create a new session (room)
+    try {
+        $.ajax({
+            url: server_url,
+            type: 'POST',
+            dataType: 'json',
+            crossDomain: true,
+            jsonp: false,
+            success: function (data) { handleCreateResponse(data) },
+            error: AjaxError
+        });
+    } catch (err) {
+        show_error('Failed to get new session from server: ' + err);
+    }
 }
 
 
 function show_votes(votes) {
+    // Display all votes from all locations
     var result = '<tr><th>User</th><th>Vote</th></tr>';
     var total = 0;
     var vote_count = 0;
@@ -335,6 +340,7 @@ function show_votes(votes) {
     var displayed_avg;
     var displayed_rounded;
 
+    // See if there are extreme gaps between high and low votes
     var extreme_votes = find_extreme_votes(votes);
 
     for (var key in votes) {
@@ -369,6 +375,7 @@ function show_votes(votes) {
         avg = total;
     }
 
+    // Mask (*) votes until we (local group) has voted
     if (location_has_voted) {
         displayed_avg = '  (' + avg.toString() + ')';
         displayed_rounded = Math.round(avg).toString();
@@ -377,7 +384,7 @@ function show_votes(votes) {
         displayed_rounded = "***"
     }
 
-    result += '<tr><td><b>Average:</b>' + displayed_avg + '</td><td><b><span id="lblAverage">' + displayed_rounded  + '</span></b></td></tr>';
+    result += '<tr><td><b>Average:</b>' + displayed_avg + '</td><td><b><span id="lblAverage" class=text-primary lead">' + displayed_rounded  + '</span></b></td></tr>';
     $('#votes').html(result);
 
     // Briefly highlight the total
@@ -385,9 +392,9 @@ function show_votes(votes) {
     $( "#lblAverage" ).effect("highlight", 2000);
 
     if (extreme_votes.length > 0) {
-        logit('More than 2 number gaps present in votes');
         // Add extreme class (highlighter) to all cells marked extreme-alert
         // (tried using .addClass to do this but it would not paint the color after the TD got that class)
+        logit('More than 2 number gaps present in votes');
         var cells = $('td[name=extreme-alert]');
         for (var i=0, len=cells.length; i<len; i++){
             cells[i].style.backgroundColor = EXTREME_ALERT_COLOR;
@@ -397,7 +404,12 @@ function show_votes(votes) {
 }
 
 function handleCreateResponse(data) {
-    socket.emit('join', {room: data.id, location: 'host'});
+    // Process new session created by server
+    try {
+        socket.emit('join', {room: data.id, location: 'host'});
+    } catch (err) {
+        show_error('Cannot join newly created room: ' + err);
+    }
 }
 
 function find_extreme_votes(votes) {
@@ -428,7 +440,7 @@ function find_extreme_votes(votes) {
         }
     }
 
-// DEBUG logit(max_pos.toString() + ' - ' + min_pos.toString() + ' = ' + (max_pos-min_pos).toString());
+    // DEBUG logit(max_pos.toString() + ' - ' + min_pos.toString() + ' = ' + (max_pos-min_pos).toString());
 
     // Second, measure the distance between the positions
     if ((max_pos - min_pos) > 2){
@@ -444,17 +456,24 @@ function do_reset_button() {
 }
 
 function reset_votes() {
+    // Reset all votes for all locations
     var this_room = $('#lblSessionId').text();
     data = {room: this_room};
-    socket.emit('reset', data);
+    try {
+        socket.emit('reset', data);
+    } catch (err) {
+        show_error('Cannot send votes reset to server: ' + err);
+    }    
 }
 
 function logit(msg) {
+    // Add message to top of visual log
     $('#Log').prepend(msg + '<br/>');
 }
 
 
-function OnError(xhr, errorType, exception) {
+function AjaxError(xhr, errorType, exception) {
+    // Error handler for ajax calls
     var msg;
     try {
         responseText = $.parseJSON(xhr.responseText);
@@ -470,11 +489,13 @@ function OnError(xhr, errorType, exception) {
 }
 
 function show_error(msg) {
+    // Display major error
     $("#error_details").html(msg);
     // Make sure error section is visible
     $("#error_details").css('visibility', 'visible');
 }
 
 function clear_error(){
+    // Hide error section
     $("#error_details").html('').css('visibility', 'hidden');
 }
