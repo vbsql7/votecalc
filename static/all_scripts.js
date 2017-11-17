@@ -256,10 +256,10 @@ function do_share_button(){
 
 function reveal_sections() {
     // Show hidden sections
-    $('#main-section').show();
-    $('#main-section').show();
-    $('#votes-section').show();
-    $('#update-section').show();
+    $('#main-section').css('visibility', 'visible');
+    $('#main-section').css('visibility', 'visible');
+    $('#votes-section').css('visibility', 'visible');
+    $('#update-section').css('visibility', 'visible');
 }
 function show_location_error(has_error) {
     if (has_error) {
@@ -306,7 +306,9 @@ function show_votes(votes) {
     var total = 0;
     var vote_count = 0;
     var avg = 0;
+    var rounded = 0;
     var displayed_avg;
+    var displayed_rounded;
 
     var extreme_votes = find_extreme_votes(votes);
 
@@ -343,12 +345,14 @@ function show_votes(votes) {
     }
 
     if (location_has_voted) {
-        displayed_avg = avg.toString();
+        displayed_avg = '  (' + avg.toString() + ')';
+        displayed_rounded = Math.round(avg).toString();
     } else {
-        displayed_avg = "****";
+        displayed_avg = "";
+        displayed_rounded = "***"
     }
 
-    result += '<tr><td><b>Average:</b></td><td><b><span id="lblAverage">' + displayed_avg + '</span></b></td></tr>';
+    result += '<tr><td><b>Average:</b>' + displayed_avg + '</td><td><b><span id="lblAverage">' + displayed_rounded  + '</span></b></td></tr>';
     $('#votes').html(result);
 
     // Briefly highlight the total
