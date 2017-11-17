@@ -35,13 +35,14 @@ def show_index():
 
 @socketio.on('connect')
 def connect_client():
+    """Receive connect event and broadcast back server_connected."""
     socketio.emit('server_connect', {"data": 'Connected'})
-    debugmsg('Server connect event')
     return True
 
 
 @socketio.on('send-message')
 def receive_message(data):
+    """Receive message from client to share with everyone in the room."""
     rm = data['room']
     msg = data['message']
     emit('change', {"change_type": 'message', "message": msg}, room=rm)
@@ -50,6 +51,7 @@ def receive_message(data):
 
 @socketio.on('vote')
 def process_vote(data):
+    """Process incoming votes."""
     rm = data['room']
     try:
         sess = session_manager.get_session(rm)
@@ -100,6 +102,7 @@ def parse_votes(names, votes):
 
 @socketio.on('join')
 def join_event(message):
+    """Receive join request from a client and confirm by sending joined event to everyone in the room."""
     rm = message['room']
     loc = message['location']
     debugmsg('Location ' + loc + ' joining room ' + rm)
