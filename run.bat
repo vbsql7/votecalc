@@ -1,1 +1,1 @@
-python vote_server.py
+python application.py

@@ -2,4 +2,9 @@
 
 env
 activate.bat
-.idea
+.idea__pycache*
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

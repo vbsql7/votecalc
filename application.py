@@ -14,20 +14,20 @@ async_mode = None
 # Load manager and sessions list
 session_manager = Manager()
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode=async_mode)
+application = Flask(__name__)
+application.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(application, async_mode=async_mode)
 
-CORS(app)  # Allow cross-domain requests
+CORS(application)  # Allow cross-domain requests
 
 
-@app.errorhandler(404)
-def not_found(error):
+@application.errorhandler(404)
+def not_found():
     """Handle not-found errors."""
     return make_response(jsonify({'error': 'Route (page) not found.'}), 404)
 
 
-@app.route('/')
+@application.route('/')
 def show_index():
     """Show the host starting page."""
     return render_template('index.html')
@@ -153,12 +153,12 @@ def reset_session(data):
         raise
 
 
-@app.route('/favicon.ico', methods=['GET'])
+@application.route('/favicon.ico', methods=['GET'])
 def get_favicon():
     return url_for('static', filename='favicon.ico')
 
 
-@app.route('/sessions', methods=['GET'])
+@application.route('/sessions', methods=['GET'])
 def get_sessions():
     """Get a list of all sessions. For admin monitoring use."""
     try:
@@ -169,7 +169,7 @@ def get_sessions():
         raise
 
 
-@app.route('/join/<session_id>', methods=['GET'])
+@application.route('/join/<session_id>', methods=['GET'])
 def join_session(session_id):
     """Prompt remote users for a location to identify them as they join a session."""
     try:
@@ -183,7 +183,7 @@ def join_session(session_id):
         raise
 
 
-@app.route('/location', methods=['POST'])
+@application.route('/location', methods=['POST'])
 def location_join():
     """Join a session (room) from a given location."""
     try:
@@ -202,7 +202,7 @@ def location_join():
         raise
 
 
-@app.route('/session/<session_id>', methods=['GET'])
+@application.route('/session/<session_id>', methods=['GET'])
 def get_session(session_id):
     """Get a specific session."""
     try:
@@ -216,7 +216,7 @@ def get_session(session_id):
         raise
 
 
-@app.route('/session/new', methods=['POST'])
+@application.route('/session/new', methods=['POST'])
 def create_session():
     """Create a new session."""
     try:
@@ -254,6 +254,6 @@ def debugmsg(msg):
 if __name__ == '__main__':
     """Start the voting server."""
     try:
-        socketio.run(app, debug=True)
+        socketio.run(application, debug=True)
     except Exception as e:
         print('Error in {0}: {1}'.format(__name__, str(e)), file=sys.stderr)

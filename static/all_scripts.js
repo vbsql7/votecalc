@@ -1,7 +1,7 @@
 // Custom scripts for application
 
-const APP_NAME = "Vote"
-const BASE_URL = "http://localhost:5000"
+const APP_NAME = "VoteCalc"
+const BASE_URL = "http://votecalc-env.phunu4jf3x.us-east-1.elasticbeanstalk.com/" // "http://localhost:5000"
 const EXTREME_ALERT_COLOR = "LightPink"
 
 // Globals
